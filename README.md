@@ -1,7 +1,7 @@
-SwiftAuthorizationSample demonstrates how to run privileged operations on macOS using a privileged helper tool that is
-run by launchd. It is based off of Apple's no longer updated
-[EvenBetterAuthorizationSample](https://developer.apple.com/library/archive/samplecode/EvenBetterAuthorizationSample/Introduction/Intro.html);
-however, this sample is implemented exclusively in Swift.  While Apple's sample has numerous known
+SwiftAuthorizationSample demonstrates how to run privileged operations on macOS using a helper tool managed by launchd.
+It is based off of Apple's no longer updated
+[EvenBetterAuthorizationSample](https://developer.apple.com/library/archive/samplecode/EvenBetterAuthorizationSample/Introduction/Intro.html)
+written in Objective C. This sample is implemented exclusively in Swift.  While Apple's sample has numerous known
 [security vulnerabilities](https://theevilbit.github.io/posts/secure_coding_xpc_part1/), this sample has been designed
 with security in mind. If you discover a security vulnerability, please open an issue!
 
@@ -65,45 +65,46 @@ For this operation to succeed, Apple imposes numerous requirements:
 2. The helper tool **must** be signed.
 3. The helper tool **must** be located in the `Contents/Library/LaunchServices` directory inside your app's bundle.
 4. The filename of the helper tool **should** be reverse-DNS format.
-    - If your app has the bundle identifier "com.apple.Mail" then your helper tool could have a filename of
+    - If your app has the bundle identifier "com.apple.Mail" then your helper tool **may** have a filename of
       "com.apple.Mail.helper".
-5. The helper tool **must** have an embedded launchd plist.
-6. The helper tool's embedded launchd plist **must** have an entry with `Label` as the key and the value
+5. The helper tool **must** have an embedded launchd property list.
+6. The helper tool's embedded launchd property list **must** have an entry with `Label` as the key and the value
    **must** be the filename of the helper tool.
-7. The helper tool **must** have an embedded info plist.
-8. The helper tool's embedded info plist **must** have an entry with
+7. The helper tool **must** have an embedded info property list.
+8. The helper tool's embedded info property list **must** have an entry with
    [`SMAuthorizedClients`](https://developer.apple.com/documentation/bundleresources/information_property_list/smauthorizedclients)
-   as its key and its value **must** be an array of strings. Each string **must** be a code signing  requirement. Your
-   app's code signature **must** satsify at least one of these requirements.
+   as its key and its value **must** be an array of strings. Each string **must** be a
+   [code signing requirement](https://developer.apple.com/library/archive/documentation/Security/Conceptual/CodeSigningGuide/RequirementLang/RequirementLang.html).
+   Your app **must** satisify at least one of these requirements.
     - Only processes which meet one or more of these requirements may install or update the helper tool. 
     - These requirements are *only* about which processes may install or update the helper tool. They impose no 
       restrictions on which processes can communicate with the helper tool.
-9. The helper tool's embedded info plist **must** have an entry with 
+9. The helper tool's embedded info property list **must** have an entry with 
    [`CFBundleVersion`](https://developer.apple.com/documentation/bundleresources/information_property_list/cfbundleversion)
    as its key and its value **must** be a string matching the format described in `CFBundleVersion`'s documentation.
     - This requirement is *not* documented by Apple, but is enforced.
     - While not documented by Apple, `SMJobBless` will not overwrite an existing installation of a helper tool with one
       that has an equal or lower value for its `CFBundleVersion` entry.
-    - Despite Apple requiring the info plist contain a key named `CFBundleVersion`, your helper tool **must** be a
-      Command Line Tool and **must not** be a bundle.
+    - Despite Apple requiring the info property list contain a key named `CFBundleVersion`, your helper tool **must**
+      be a Command Line Tool and **must not** be a bundle.
 10. Your app's Info.plist **must** have an entry with 
       [`SMPrivilegedExecutables`](https://developer.apple.com/documentation/bundleresources/information_property_list/smprivilegedexecutables)
     as its key and its value must be a dictionary. Each dictionary key **must** be a helper tool's filename; for example
-    "com.apple.Mail.helper". Each dictionary value **must** be a string representation of that helper tool's
-    [code signing requirement](https://developer.apple.com/library/archive/documentation/Security/Conceptual/CodeSigningGuide/RequirementLang/RequirementLang.html).
+    "com.apple.Mail.helper". Each dictionary value **must** be a string representation of a code signing requirement
+    that the helper tool satisfies.
 
 ### Satisfying These Requirements
 While Apple imposes numerous requirements, many of them only need to be configured once. For the remainder, this sample
 uses build variables and a custom build script to automate the process. In particular the build script handles:
 
-- the `SMAuthorizedClients` entry differing depending on whether it's a debug or release build
-- the `SMPrivilegedExecutables` entry differing depending on whether it's a debug or release build
-- incrementing the helper tool's `CFBundleVersion` so that it can be updated
-- ensuring the `Label` value matches the helper tool's filename
+- The `SMAuthorizedClients` entry differing depending on whether it's a debug or release build
+- The `SMPrivilegedExecutables` entry differing depending on whether it's a debug or release build
+- Incrementing the helper tool's `CFBundleVersion` so that it can be updated
+- Ensuring the `Label` value matches the helper tool's filename
 
 Additionally the build variables, build scripts, and sample code are designed to avoid any duplicative hard coding of
-these values. If you follow the pattern used in this sample and you ever wanted to change the name of your app or the
-helper tool, you'd only need to update their values in one place each.
+values such. If you follow the pattern used in this sample and ever wanted to change these values, you'd only need to
+update them in one place each.
 
 This section walks your through satisfying all of Apple's requirements.
 
@@ -171,24 +172,23 @@ on many of the build variables mentioned in the "Build Variables" section above.
 
 Create a folder for build scripts (or use an existing one) and copy PropertyListModifier.swift to it. In order to be
 run as a script the file must have its execute bit set. From a Terminal, running
-`chmod 755 PropertyListModifier.swift` on the file will make it world executable.
+`chmod 755 PropertyListModifier.swift` on the script will make it world executable.
 
-The following
-assumes you named that folder "BuildScripts". Now we need to configure your build process to run the script. The
-instructions below are applicable for Xcode 13 and may differ in future versions.
+The following assumes you named that folder "BuildScripts". Now we need to configure your build process to run the
+script. The instructions below are applicable for Xcode 13 and may differ in future versions.
 
 In your `xcodeproj` file:
 
 1. Select your app target
 2. Switch to the Build Phases tab
-3. Add a Run Script phase which occurs right after Dependencies
+3. Add a Run Script Phase which occurs right after Dependencies
 4. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift satisfyJobBlessRequirements`
 
 This will add the `SMPrivilegedExecutables` entry to your app's Info.plist each time the app is built either for debug
 or release. Because this value will differ depending on the build, you may not want your Info.plist to keep changing and
-have these changes committed your repository. To prevent this, you can do the following option steps:
+have these changes committed your repository. To prevent this, you can do the following optional steps:
 
-5. Add a Run Script phase which occurs as the last phase
+5. Add a Run Script Phase as the last phase
 6. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift cleanupJobBlessRequirements`
 
 This will delete the `SMPrivilegedExecutables` entry from your app's Info.plist at the end of the build process.
@@ -196,22 +196,22 @@ This will delete the `SMPrivilegedExecutables` entry from your app's Info.plist 
 Next we'll configure the build script to run for the helper tool:
 1. Select your helper tool target
 2. Switch to the Build Phases tab
-3. Add a Run Script phase which occurs right after Dependencies
+3. Add a Run Script Phase which occurs right after the Dependencies Phase
 4. Set the command to be run as
    `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift satisfyJobBlessRequirements autoIncrementVersion`
    
-This will add the `SMAuthorizedClients` entry to the helper tool's info property list and the `Label` entry to the
-launchd property list each time the app is built either for debug or release. If you do not want these entries to be 
-persisted as part of the Info.plist:
+By specifying "satisfyJobBlessRequirements", the script will add the `SMAuthorizedClients` entry to the helper tool's
+info property list and the `Label` entry to the launchd property list each time the app is built either for debug or
+release. If you do not want these entries to be persisted as part of the Info.plist:
 
-5. Add a Run Script phase which occurs as the last phase
+5. Add a Run Script Phase as the last phase
 6. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift cleanupJobBlessRequirements`
 
-By specifiying "autoIncrementVersion", the script will increment the patch value of the `CFBundleVersion` entry if the 
+By specifying "autoIncrementVersion", the script will increment the patch value of the `CFBundleVersion` entry if the 
 source code has changed. In order for the script to determine if the source code has changed it creates an entry in your
 helper tool's info property list with the `BuildHash` key and a value equal to the SHA256 hash of the helper tool's
 source code. In order for the version number to continue autoincrementing you'll need to commit these changes. If you do
-not want this autoincrement behavior, do not pass the `autoIncrementVersion` argument to the build script. 
+not want this autoincrement behavior, do not specify `autoIncrementVersion` as an argument for the build script. 
 
 ## Communicating With a Helper Tool
 Communication between your app and the helper tool should be thought of as a client server relationship.  Your app
@@ -249,24 +249,24 @@ While SecureXPC is designed to restrict which processes your server handle reque
 of exploits. (For example there could be a vulnerability in your app which gets exploited allowing for arbitrary code
 execution.) As such it is a best practice to limit what actions your helper tool can do to the absolute bare minimum
 required by your app. This way if an exploit exists it limits the damage. In the sample while the helper tool uses
-`Process` to run executables as root, but it does not honor requests for any arbitrary executable - only those specified
-in the `AllowedCommand` enum are run.
+`Process` to run executables as root, it does not honor requests for any arbitrary executable - only those specified in
+the `AllowedCommand` enum are run.
 
 ## Determining a Helper Tool's Install Status
 Apple does not provide an API to determine the install status of a helper tool. However, this can still be achieved. See
 SwiftAuthorizationApp/HelperToolMonitor.swift for an example. There are three different components that make up a helper 
-tool being installed, it is not purely a binary situation. For example the helper tool coul be registered with launch
-control (the public interface to launchd) and yet the actual executable may not exist on disk.
+tool being installed, it is not purely a yes/no situation. For example the helper tool could be registered with launch
+control (the public interface to launchd) and yet the actual helper tool executable may not exist on disk.
 
 ## Uninstalling a Helper Tool
 Apple does not provide an API to uninstall the helper tool. Their
-[official position](https://developer.apple.com/forums/thread/66821) is, "Users who don’t care won’t notice the leftover
+[stated position](https://developer.apple.com/forums/thread/66821) is, "Users who don’t care won’t notice the leftover
 helper." Despite not providing an API, it is *possible* for the helper tool to uninstall itself. See
 SwiftAuthorizationHelperTool/Uninstaller.swift for an example of how to do so.
 
 ## Updating a Helper Tool
 `SMJobBless` and the equivalent convenience version offered by the Blessed framework can with user authorization
-manually update an installer helper tool. If your app would like to automatically update the helper tool without
+manually update an installed helper tool. If your app would like to automatically update the helper tool without
 user involvement see SwiftAuthorizationHelperTool/Update.swift for an example of how to do so. Note that this updater
 has certain self-imposed restrictions and will not perform an update in all circumstances.
 
