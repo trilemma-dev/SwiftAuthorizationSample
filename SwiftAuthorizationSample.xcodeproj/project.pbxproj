@@ -11,19 +11,59 @@
 		99F409D127216B210010500C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99F409D027216B210010500C /* ViewController.swift */; };
 		99F409D327216B230010500C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 99F409D227216B230010500C /* Assets.xcassets */; };
 		99F409D627216B230010500C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 99F409D427216B230010500C /* Main.storyboard */; };
+		99F409E427216BFF0010500C /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99F409E327216BFF0010500C /* main.swift */; };
+		99F409FA272308C50010500C /* com.example.SwiftAuthorizationApp.helper in CopyFiles */ = {isa = PBXBuildFile; fileRef = 99F409E127216BFF0010500C /* com.example.SwiftAuthorizationApp.helper */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		99F409DF27216BFF0010500C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		99F409F32723044C0010500C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Library/LaunchServices;
+			dstSubfolderSpec = 1;
+			files = (
+				99F409FA272308C50010500C /* com.example.SwiftAuthorizationApp.helper in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		99F409CB27216B210010500C /* SwiftAuthorizationSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftAuthorizationSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		99F409CB27216B210010500C /* SwiftAuthorizationApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftAuthorizationApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		99F409CE27216B210010500C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		99F409D027216B210010500C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		99F409D227216B230010500C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		99F409D527216B230010500C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		99F409D727216B230010500C /* SwiftAuthorizationSample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SwiftAuthorizationSample.entitlements; sourceTree = "<group>"; };
+		99F409E127216BFF0010500C /* com.example.SwiftAuthorizationApp.helper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = com.example.SwiftAuthorizationApp.helper; sourceTree = BUILT_PRODUCTS_DIR; };
+		99F409E327216BFF0010500C /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		99F409E827216CD10010500C /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		99F409EA2722FBA10010500C /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		99F409EB2722FC670010500C /* AppConfig.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppConfig.xcconfig; sourceTree = "<group>"; };
+		99F409EC2722FD0C0010500C /* HelperToolConfig.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = HelperToolConfig.xcconfig; sourceTree = "<group>"; };
+		99F409EE272300EB0010500C /* PropertyListModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertyListModifier.swift; sourceTree = "<group>"; };
+		99F409F6272304B20010500C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		99F409F7272304C20010500C /* launchd.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = launchd.plist; sourceTree = "<group>"; };
+		99F409F8272304D70010500C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		99F409C827216B210010500C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		99F409DE27216BFF0010500C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -36,7 +76,12 @@
 		99F409C227216B210010500C = {
 			isa = PBXGroup;
 			children = (
-				99F409CD27216B210010500C /* SwiftAuthorizationSample */,
+				99F409E827216CD10010500C /* README.md */,
+				99F409EA2722FBA10010500C /* Config.xcconfig */,
+				99F409F52723049E0010500C /* Shared */,
+				99F409CD27216B210010500C /* SwiftAuthorizationApp */,
+				99F409E227216BFF0010500C /* SwiftAuthorizationHelperTool */,
+				99F409ED272300910010500C /* BuildScripts */,
 				99F409CC27216B210010500C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -44,42 +89,92 @@
 		99F409CC27216B210010500C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				99F409CB27216B210010500C /* SwiftAuthorizationSample.app */,
+				99F409CB27216B210010500C /* SwiftAuthorizationApp.app */,
+				99F409E127216BFF0010500C /* com.example.SwiftAuthorizationApp.helper */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		99F409CD27216B210010500C /* SwiftAuthorizationSample */ = {
+		99F409CD27216B210010500C /* SwiftAuthorizationApp */ = {
 			isa = PBXGroup;
 			children = (
+				99F409EB2722FC670010500C /* AppConfig.xcconfig */,
+				99F409F8272304D70010500C /* Info.plist */,
 				99F409CE27216B210010500C /* AppDelegate.swift */,
 				99F409D027216B210010500C /* ViewController.swift */,
 				99F409D227216B230010500C /* Assets.xcassets */,
 				99F409D427216B230010500C /* Main.storyboard */,
-				99F409D727216B230010500C /* SwiftAuthorizationSample.entitlements */,
 			);
-			path = SwiftAuthorizationSample;
+			path = SwiftAuthorizationApp;
+			sourceTree = "<group>";
+		};
+		99F409E227216BFF0010500C /* SwiftAuthorizationHelperTool */ = {
+			isa = PBXGroup;
+			children = (
+				99F409EC2722FD0C0010500C /* HelperToolConfig.xcconfig */,
+				99F409F6272304B20010500C /* Info.plist */,
+				99F409F7272304C20010500C /* launchd.plist */,
+				99F409E327216BFF0010500C /* main.swift */,
+			);
+			path = SwiftAuthorizationHelperTool;
+			sourceTree = "<group>";
+		};
+		99F409ED272300910010500C /* BuildScripts */ = {
+			isa = PBXGroup;
+			children = (
+				99F409EE272300EB0010500C /* PropertyListModifier.swift */,
+			);
+			path = BuildScripts;
+			sourceTree = "<group>";
+		};
+		99F409F52723049E0010500C /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		99F409CA27216B210010500C /* SwiftAuthorizationSample */ = {
+		99F409CA27216B210010500C /* SwiftAuthorizationApp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 99F409DA27216B230010500C /* Build configuration list for PBXNativeTarget "SwiftAuthorizationSample" */;
+			buildConfigurationList = 99F409DA27216B230010500C /* Build configuration list for PBXNativeTarget "SwiftAuthorizationApp" */;
 			buildPhases = (
+				99F409EF2723039B0010500C /* ShellScript */,
 				99F409C727216B210010500C /* Sources */,
 				99F409C827216B210010500C /* Frameworks */,
 				99F409C927216B210010500C /* Resources */,
+				99F409F32723044C0010500C /* CopyFiles */,
+				99F409F0272303D10010500C /* ShellScript */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = SwiftAuthorizationSample;
+			name = SwiftAuthorizationApp;
 			productName = SwiftAuthorizationSample;
-			productReference = 99F409CB27216B210010500C /* SwiftAuthorizationSample.app */;
+			productReference = 99F409CB27216B210010500C /* SwiftAuthorizationApp.app */;
 			productType = "com.apple.product-type.application";
+		};
+		99F409E027216BFF0010500C /* SwiftAuthorizationHelperTool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 99F409E527216BFF0010500C /* Build configuration list for PBXNativeTarget "SwiftAuthorizationHelperTool" */;
+			buildPhases = (
+				99F409F1272303E00010500C /* ShellScript */,
+				99F409DD27216BFF0010500C /* Sources */,
+				99F409DE27216BFF0010500C /* Frameworks */,
+				99F409DF27216BFF0010500C /* CopyFiles */,
+				99F409F2272303F20010500C /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SwiftAuthorizationHelperTool;
+			productName = SwiftAuthorizationHelper;
+			productReference = 99F409E127216BFF0010500C /* com.example.SwiftAuthorizationApp.helper */;
+			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
@@ -92,6 +187,9 @@
 				LastUpgradeCheck = 1300;
 				TargetAttributes = {
 					99F409CA27216B210010500C = {
+						CreatedOnToolsVersion = 13.0;
+					};
+					99F409E027216BFF0010500C = {
 						CreatedOnToolsVersion = 13.0;
 					};
 				};
@@ -109,7 +207,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				99F409CA27216B210010500C /* SwiftAuthorizationSample */,
+				99F409CA27216B210010500C /* SwiftAuthorizationApp */,
+				99F409E027216BFF0010500C /* SwiftAuthorizationHelperTool */,
 			);
 		};
 /* End PBXProject section */
@@ -126,6 +225,77 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		99F409EF2723039B0010500C /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift satisfyJobBlessRequirements\n";
+		};
+		99F409F0272303D10010500C /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift cleanupJobBlessRequirements\n";
+		};
+		99F409F1272303E00010500C /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift satisfyJobBlessRequirements specifyMachServices autoIncrementVersion\n\n";
+		};
+		99F409F2272303F20010500C /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift cleanupJobBlessRequirements cleanupMachServices\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		99F409C727216B210010500C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -133,6 +303,14 @@
 			files = (
 				99F409D127216B210010500C /* ViewController.swift in Sources */,
 				99F409CF27216B210010500C /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		99F409DD27216BFF0010500C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				99F409E427216BFF0010500C /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -152,6 +330,7 @@
 /* Begin XCBuildConfiguration section */
 		99F409D827216B230010500C /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 99F409EA2722FBA10010500C /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -208,11 +387,13 @@
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
 		99F409D927216B230010500C /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 99F409EA2722FBA10010500C /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -262,56 +443,53 @@
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
 		99F409DB27216B230010500C /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 99F409EB2722FC670010500C /* AppConfig.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = SwiftAuthorizationSample/SwiftAuthorizationSample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSMainStoryboardFile = Main;
-				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				DEVELOPMENT_TEAM = R96J7HJPH8;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.SwiftAuthorizationSample;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
 		99F409DC27216B230010500C /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 99F409EB2722FC670010500C /* AppConfig.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = SwiftAuthorizationSample/SwiftAuthorizationSample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSMainStoryboardFile = Main;
-				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				DEVELOPMENT_TEAM = R96J7HJPH8;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.SwiftAuthorizationSample;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		99F409E627216BFF0010500C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 99F409EC2722FD0C0010500C /* HelperToolConfig.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = R96J7HJPH8;
+			};
+			name = Debug;
+		};
+		99F409E727216BFF0010500C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 99F409EC2722FD0C0010500C /* HelperToolConfig.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = R96J7HJPH8;
 			};
 			name = Release;
 		};
@@ -327,11 +505,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		99F409DA27216B230010500C /* Build configuration list for PBXNativeTarget "SwiftAuthorizationSample" */ = {
+		99F409DA27216B230010500C /* Build configuration list for PBXNativeTarget "SwiftAuthorizationApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				99F409DB27216B230010500C /* Debug */,
 				99F409DC27216B230010500C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		99F409E527216BFF0010500C /* Build configuration list for PBXNativeTarget "SwiftAuthorizationHelperTool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				99F409E627216BFF0010500C /* Debug */,
+				99F409E727216BFF0010500C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

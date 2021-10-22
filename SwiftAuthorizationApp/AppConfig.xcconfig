@@ -1,0 +1,29 @@
+//
+//  AppConfig.xcconfig
+//  SwiftAuthorizationSample
+//
+//  Created by Josh Kaplan on 2021-10-23-21
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+#include "Config.xcconfig"
+
+// There should not be a need to modify anything in this configuration file
+
+PRODUCT_BUNDLE_IDENTIFIER = $(APP_BUNDLE_IDENTIFIER)
+TARGET_NAME = $(APP_TARGET_NAME)
+PRODUCT_NAME = $(APP_TARGET_NAME)
+
+// It is not possible to use the Authorization framework from a sandboxed app
+ENABLE_APP_SANDBOX = NO
+
+// Info property list
+INFOPLIST_FILE = $(APP_TARGET_DIRECTORY)/Info.plist
+GENERATE_INFOPLIST_FILE = YES
+INFOPLIST_KEY_CFBundleName = $(APP_TARGET_NAME)
+INFOPLIST_KEY_CFBundleExecutable = $(APP_TARGET_NAME)
+// These entries are specific to this sample using a Storyboard
+INFOPLIST_KEY_NSMainStoryboardFile = Main
+INFOPLIST_KEY_NSPrincipalClass = NSApplication

@@ -1,0 +1,41 @@
+//
+//  Config.xcconfig
+//  SwiftAuthorizationSample
+//
+//  Created by Josh Kaplan on 2021-10-23
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+// *IMPORTANT*
+// Update these values when you've chosen non-example bundle identifiers and names. These values are referenced from
+// numerous other places in such a way that you should only need to update the values here in order for everything
+// to work. These values are not hardcoded anywhere within the Swift source files or build script.
+APP_BUNDLE_IDENTIFIER = com.example.SwiftAuthorizationApp
+APP_TARGET_DIRECTORY = SwiftAuthorizationApp
+APP_TARGET_NAME = SwiftAuthorizationApp
+
+HELPER_TOOL_BUNDLE_IDENTIFIER = com.example.SwiftAuthorizationApp.helper
+HELPER_TOOL_TARGET_DIRECTORY = SwiftAuthorizationHelperTool
+
+// Setting a minimum deployment targer less than 10.14.4 means the Swift 5 Runtime Support for Command Line Tools
+// must be installed in order for the helper tool to run. (Alternatively the helper tool could be implemented in another
+// language such as Objective C, C, or C++.)
+MACOSX_DEPLOYMENT_TARGET = 10.14.4
+
+
+// There should not be a need to modify anything below this line in this configuration file unless you modify the
+// folder structure of this project
+
+
+// Directory containing app-specific code shared by both the app and helper tool
+SHARED_DIRECTORY = SHARED
+
+
+// There should never be a need to modify anything below this line in this configuration file
+
+
+// Required for notarization. Protects the app from classes of exploits, like code injection, dynamically linked library
+// (DLL) hijacking, and process memory space tampering
+ENABLE_HARDENED_RUNTIME = YES

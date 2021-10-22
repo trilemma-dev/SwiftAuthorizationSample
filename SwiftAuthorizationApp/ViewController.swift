@@ -2,7 +2,7 @@
 //  ViewController.swift
 //  SwiftAuthorizationSample
 //
-//  Created by Josh Kaplan on 10/21/21.
+//  Created by Josh Kaplan on 2021-10-21
 //
 
 import Cocoa
