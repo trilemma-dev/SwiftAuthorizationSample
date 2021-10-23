@@ -104,9 +104,6 @@
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
-                                            <connections>
-                                                <action selector="installOrUpdate:" target="XfG-lQ-9wD" id="EQ2-4a-QNr"/>
-                                            </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="S9j-2a-u4I">
                                             <rect key="frame" x="475" y="5" width="87" height="32"/>

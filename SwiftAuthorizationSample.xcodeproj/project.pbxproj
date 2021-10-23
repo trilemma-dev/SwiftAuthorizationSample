@@ -13,6 +13,13 @@
 		99A67B3C2723B30800F7D92D /* Blessed in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B3B2723B30800F7D92D /* Blessed */; };
 		99A67B3E2723B30D00F7D92D /* SecureXPC in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B3D2723B30D00F7D92D /* SecureXPC */; };
 		99A67B402723B31000F7D92D /* EmbeddedPropertyList in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B3F2723B31000F7D92D /* EmbeddedPropertyList */; };
+		99A67B4827240DB100F7D92D /* HelperToolMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B4727240DB100F7D92D /* HelperToolMonitor.swift */; };
+		99A67B4A2724111200F7D92D /* HelperToolLaunchdPropertyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B492724111200F7D92D /* HelperToolLaunchdPropertyList.swift */; };
+		99A67B4B2724111200F7D92D /* HelperToolLaunchdPropertyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B492724111200F7D92D /* HelperToolLaunchdPropertyList.swift */; };
+		99A67B4D2724125200F7D92D /* HelperToolInfoPropertyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B4C2724125200F7D92D /* HelperToolInfoPropertyList.swift */; };
+		99A67B4E2724125200F7D92D /* HelperToolInfoPropertyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B4C2724125200F7D92D /* HelperToolInfoPropertyList.swift */; };
+		99A67B502724134800F7D92D /* SharedConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B4F2724134800F7D92D /* SharedConstants.swift */; };
+		99A67B512724134800F7D92D /* SharedConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B4F2724134800F7D92D /* SharedConstants.swift */; };
 		99F409CF27216B210010500C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99F409CE27216B210010500C /* AppDelegate.swift */; };
 		99F409D127216B210010500C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99F409D027216B210010500C /* ViewController.swift */; };
 		99F409D327216B230010500C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 99F409D227216B230010500C /* Assets.xcassets */; };
@@ -44,6 +51,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		99A67B4727240DB100F7D92D /* HelperToolMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperToolMonitor.swift; sourceTree = "<group>"; };
+		99A67B492724111200F7D92D /* HelperToolLaunchdPropertyList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperToolLaunchdPropertyList.swift; sourceTree = "<group>"; };
+		99A67B4C2724125200F7D92D /* HelperToolInfoPropertyList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperToolInfoPropertyList.swift; sourceTree = "<group>"; };
+		99A67B4F2724134800F7D92D /* SharedConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedConstants.swift; sourceTree = "<group>"; };
 		99F409CB27216B210010500C /* SwiftAuthorizationApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftAuthorizationApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		99F409CE27216B210010500C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		99F409D027216B210010500C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -121,6 +132,7 @@
 				99F409EB2722FC670010500C /* AppConfig.xcconfig */,
 				99F409F8272304D70010500C /* Info.plist */,
 				99F409CE27216B210010500C /* AppDelegate.swift */,
+				99A67B4727240DB100F7D92D /* HelperToolMonitor.swift */,
 				99F409D027216B210010500C /* ViewController.swift */,
 				99F409D227216B230010500C /* Assets.xcassets */,
 				99F409D427216B230010500C /* Main.storyboard */,
@@ -150,6 +162,9 @@
 		99F409F52723049E0010500C /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				99A67B492724111200F7D92D /* HelperToolLaunchdPropertyList.swift */,
+				99A67B4C2724125200F7D92D /* HelperToolInfoPropertyList.swift */,
+				99A67B4F2724134800F7D92D /* SharedConstants.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -336,8 +351,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				99A67B4A2724111200F7D92D /* HelperToolLaunchdPropertyList.swift in Sources */,
 				99F409D127216B210010500C /* ViewController.swift in Sources */,
 				99F409CF27216B210010500C /* AppDelegate.swift in Sources */,
+				99A67B4D2724125200F7D92D /* HelperToolInfoPropertyList.swift in Sources */,
+				99A67B502724134800F7D92D /* SharedConstants.swift in Sources */,
+				99A67B4827240DB100F7D92D /* HelperToolMonitor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -345,6 +364,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				99A67B512724134800F7D92D /* SharedConstants.swift in Sources */,
+				99A67B4B2724111200F7D92D /* HelperToolLaunchdPropertyList.swift in Sources */,
+				99A67B4E2724125200F7D92D /* HelperToolInfoPropertyList.swift in Sources */,
 				99F409E427216BFF0010500C /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
