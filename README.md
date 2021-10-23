@@ -1,28 +1,20 @@
 SwiftAuthorizationSample demonstrates how to run privileged operations on macOS using a helper tool managed by launchd.
-It is based off of Apple's no longer updated
-[EvenBetterAuthorizationSample](https://developer.apple.com/library/archive/samplecode/EvenBetterAuthorizationSample/Introduction/Intro.html)
-written in Objective C. This sample is implemented exclusively in Swift.  While Apple's sample has numerous known
-[security vulnerabilities](https://theevilbit.github.io/posts/secure_coding_xpc_part1/), this sample has been designed
-with security in mind. If you discover a security vulnerability, please open an issue!
 
-This sample was created with the expectation that you already have an application and are looking to add a privileged 
-helper tool in order to perform one or more operations as root. As such this sample is **not** a template and is instead
+This sample was created with the expectation that you already have an app and are looking to add a privileged helper
+tool in order to perform one or more operations as root. As such this sample is **not** a template and is instead
 written in a modular way which should make it easy for you to add portions of this code to your project as desired.
 
-While this sample shows one app installing and communicating with one helper tool, the relationship can be many to 
-many. An app can install and communicate with arbitrarily many privileged helper tools. A helper tool could be
-installed/updated by and communicate with multiple apps.
+To try out this sample, configure your Developer ID signing certificate and you should be good to go. If you run into
+issues it may be because of Xcode compatability issues; this sample was created with Xcode 13.
 
-This sample was created with Xcode 13 and targets macOS 10.14.4 and above.
-
-To try out this sample, just configure your Developer ID signing certificate and you should be good to go. Read the
-following sections to learn how you can incorporate portions of this sample into your own project.
+Read the following sections to learn how you can incorporate portions of this sample into your own project. The source
+code of the sample also contains comments throughout.
 
 ## macOS Support
-If you would like to support pre-10.14.4 versions of macOS, the helper tool either cannot be written in Swift or
-[Swift 5 Runtime Support for Command Line Tools](https://support.apple.com/kb/DL1998) must be installed. This is because
-the helper tool must be a Command Line Tool (not an app bundle) and starting with Swift 5 and Xcode 10.2, Apple made the
-decision to end support for embedding the Swift runtime into Command Line Tools.
+This sample targets macOS 10.14.4 and above. If you would like to support pre-10.14.4 versions of macOS, the helper tool
+cannot be written in Swift or [Swift 5 Runtime Support for Command Line Tools](https://support.apple.com/kb/DL1998) must
+be installed. This is because the helper tool must be a Command Line Tool (not an app bundle) and starting with Swift 5
+and Xcode 10.2, Apple made the decision to end support for embedding the Swift runtime into Command Line Tools.
 
 Note: The helper tool, once installed, will **not** be run from inside of your app bundle and so it cannot target any
 Swift runtime bundled with your app. (This is unlike XPC Services which may do this.)
@@ -44,7 +36,7 @@ Three Swift frameworks were created specifically for this helper tool use case:
   - Directly read the info and launchd property lists embedded in the helper tool
   - This is a dependency for SecureXPC
 
-Each of these dependencies have their own READMEs as well as full DocC documentation.
+Each of these frameworks have their own READMEs as well as full DocC documentation.
 
 ##  Installing a Helper Tool
 macOS allows apps to indirectly run code as root by installing a privileged helper tool. If you were to directly use
@@ -55,7 +47,7 @@ framework to have the user authenticate as an admin and then call
 the installation. The [Blessed](https://github.com/trilemma-dev/Blessed) framework used by this sample simplifies this
 to just one function call.
 
-If this operation succeeds the helper tool will be copied from the `Contents/Library/LaunchServices`  directory inside
+If this operation succeeds the helper tool will be copied from the `Contents/Library/LaunchServices` directory inside
 your app bundle to `/Library/PrivilegedHelperTools/`. Once installed, it managed by
 [launchd](https://support.apple.com/guide/terminal/script-management-with-launchd-apdc6c1077b-5d5d-4d35-9c19-60f2397b2369/mac).
 
@@ -273,3 +265,15 @@ has certain self-imposed restrictions and will not perform an update in all circ
 ## App Architecture & UI
 The sample app's architecture and UI are not meant to serve as examples of how to best build a macOS app. Please
 consult other resources for such guidance.
+
+## Other Considerations
+While this sample shows one app installing and communicating with one helper tool, the relationship can be many to 
+many. An app can install and communicate with arbitrarily many privileged helper tools. A helper tool could be
+installed/updated by and communicate with multiple apps.
+
+## Origin
+This sample is inspired by Apple's no longer updated
+[EvenBetterAuthorizationSample](https://developer.apple.com/library/archive/samplecode/EvenBetterAuthorizationSample/Introduction/Intro.html)
+written in Objective C. This sample is implemented exclusively in Swift. While Apple's sample has numerous known
+[security vulnerabilities](https://theevilbit.github.io/posts/secure_coding_xpc_part1/), this sample has been designed
+with security in mind. If you discover a security vulnerability, please open an issue!
