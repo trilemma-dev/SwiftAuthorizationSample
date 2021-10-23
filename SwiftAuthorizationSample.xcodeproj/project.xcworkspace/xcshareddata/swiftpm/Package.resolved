@@ -1,0 +1,34 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Blessed",
+        "repositoryURL": "https://github.com/trilemma-dev/Blessed",
+        "state": {
+          "branch": null,
+          "revision": "cb77d0c60cae915728475d7f39d841a8e6a61460",
+          "version": "0.1.0"
+        }
+      },
+      {
+        "package": "EmbeddedPropertyList",
+        "repositoryURL": "https://github.com/trilemma-dev/EmbeddedPropertyList",
+        "state": {
+          "branch": null,
+          "revision": "8e6839b742b919582ff82f30d08f33307af28323",
+          "version": "1.0.1"
+        }
+      },
+      {
+        "package": "SecureXPC",
+        "repositoryURL": "https://github.com/trilemma-dev/SecureXPC",
+        "state": {
+          "branch": null,
+          "revision": "422a3e3289d5c048a1bbfcc19e101dc1527728ea",
+          "version": "0.2.1"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

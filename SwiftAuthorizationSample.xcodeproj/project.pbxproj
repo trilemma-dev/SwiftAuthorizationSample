@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		99A67B332723B2D200F7D92D /* SecureXPC in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B322723B2D200F7D92D /* SecureXPC */; };
+		99A67B362723B2E700F7D92D /* EmbeddedPropertyList in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B352723B2E700F7D92D /* EmbeddedPropertyList */; };
+		99A67B392723B2FC00F7D92D /* Blessed in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B382723B2FC00F7D92D /* Blessed */; };
+		99A67B3C2723B30800F7D92D /* Blessed in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B3B2723B30800F7D92D /* Blessed */; };
+		99A67B3E2723B30D00F7D92D /* SecureXPC in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B3D2723B30D00F7D92D /* SecureXPC */; };
+		99A67B402723B31000F7D92D /* EmbeddedPropertyList in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B3F2723B31000F7D92D /* EmbeddedPropertyList */; };
 		99F409CF27216B210010500C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99F409CE27216B210010500C /* AppDelegate.swift */; };
 		99F409D127216B210010500C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99F409D027216B210010500C /* ViewController.swift */; };
 		99F409D327216B230010500C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 99F409D227216B230010500C /* Assets.xcassets */; };
@@ -60,6 +66,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				99A67B392723B2FC00F7D92D /* Blessed in Frameworks */,
+				99A67B332723B2D200F7D92D /* SecureXPC in Frameworks */,
+				99A67B362723B2E700F7D92D /* EmbeddedPropertyList in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -67,12 +76,22 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				99A67B3C2723B30800F7D92D /* Blessed in Frameworks */,
+				99A67B3E2723B30D00F7D92D /* SecureXPC in Frameworks */,
+				99A67B402723B31000F7D92D /* EmbeddedPropertyList in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		99A67B3A2723B30800F7D92D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		99F409C227216B210010500C = {
 			isa = PBXGroup;
 			children = (
@@ -83,6 +102,7 @@
 				99F409E227216BFF0010500C /* SwiftAuthorizationHelperTool */,
 				99F409ED272300910010500C /* BuildScripts */,
 				99F409CC27216B210010500C /* Products */,
+				99A67B3A2723B30800F7D92D /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -153,6 +173,11 @@
 			dependencies = (
 			);
 			name = SwiftAuthorizationApp;
+			packageProductDependencies = (
+				99A67B322723B2D200F7D92D /* SecureXPC */,
+				99A67B352723B2E700F7D92D /* EmbeddedPropertyList */,
+				99A67B382723B2FC00F7D92D /* Blessed */,
+			);
 			productName = SwiftAuthorizationSample;
 			productReference = 99F409CB27216B210010500C /* SwiftAuthorizationApp.app */;
 			productType = "com.apple.product-type.application";
@@ -172,6 +197,11 @@
 			dependencies = (
 			);
 			name = SwiftAuthorizationHelperTool;
+			packageProductDependencies = (
+				99A67B3B2723B30800F7D92D /* Blessed */,
+				99A67B3D2723B30D00F7D92D /* SecureXPC */,
+				99A67B3F2723B31000F7D92D /* EmbeddedPropertyList */,
+			);
 			productName = SwiftAuthorizationHelper;
 			productReference = 99F409E127216BFF0010500C /* com.example.SwiftAuthorizationApp.helper */;
 			productType = "com.apple.product-type.tool";
@@ -203,6 +233,11 @@
 				Base,
 			);
 			mainGroup = 99F409C227216B210010500C;
+			packageReferences = (
+				99A67B312723B2D200F7D92D /* XCRemoteSwiftPackageReference "SecureXPC" */,
+				99A67B342723B2E700F7D92D /* XCRemoteSwiftPackageReference "EmbeddedPropertyList" */,
+				99A67B372723B2FC00F7D92D /* XCRemoteSwiftPackageReference "Blessed" */,
+			);
 			productRefGroup = 99F409CC27216B210010500C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -452,7 +487,7 @@
 			baseConfigurationReference = 99F409EB2722FC670010500C /* AppConfig.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = R96J7HJPH8;
+				DEVELOPMENT_TEAM = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -466,7 +501,7 @@
 			baseConfigurationReference = 99F409EB2722FC670010500C /* AppConfig.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = R96J7HJPH8;
+				DEVELOPMENT_TEAM = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -480,7 +515,7 @@
 			baseConfigurationReference = 99F409EC2722FD0C0010500C /* HelperToolConfig.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = R96J7HJPH8;
+				DEVELOPMENT_TEAM = "";
 			};
 			name = Debug;
 		};
@@ -489,7 +524,7 @@
 			baseConfigurationReference = 99F409EC2722FD0C0010500C /* HelperToolConfig.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = R96J7HJPH8;
+				DEVELOPMENT_TEAM = "";
 			};
 			name = Release;
 		};
@@ -524,6 +559,66 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		99A67B312723B2D200F7D92D /* XCRemoteSwiftPackageReference "SecureXPC" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/trilemma-dev/SecureXPC";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.2.0;
+			};
+		};
+		99A67B342723B2E700F7D92D /* XCRemoteSwiftPackageReference "EmbeddedPropertyList" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/trilemma-dev/EmbeddedPropertyList";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		99A67B372723B2FC00F7D92D /* XCRemoteSwiftPackageReference "Blessed" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/trilemma-dev/Blessed";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		99A67B322723B2D200F7D92D /* SecureXPC */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 99A67B312723B2D200F7D92D /* XCRemoteSwiftPackageReference "SecureXPC" */;
+			productName = SecureXPC;
+		};
+		99A67B352723B2E700F7D92D /* EmbeddedPropertyList */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 99A67B342723B2E700F7D92D /* XCRemoteSwiftPackageReference "EmbeddedPropertyList" */;
+			productName = EmbeddedPropertyList;
+		};
+		99A67B382723B2FC00F7D92D /* Blessed */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 99A67B372723B2FC00F7D92D /* XCRemoteSwiftPackageReference "Blessed" */;
+			productName = Blessed;
+		};
+		99A67B3B2723B30800F7D92D /* Blessed */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 99A67B372723B2FC00F7D92D /* XCRemoteSwiftPackageReference "Blessed" */;
+			productName = Blessed;
+		};
+		99A67B3D2723B30D00F7D92D /* SecureXPC */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 99A67B312723B2D200F7D92D /* XCRemoteSwiftPackageReference "SecureXPC" */;
+			productName = SecureXPC;
+		};
+		99A67B3F2723B31000F7D92D /* EmbeddedPropertyList */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 99A67B342723B2E700F7D92D /* XCRemoteSwiftPackageReference "EmbeddedPropertyList" */;
+			productName = EmbeddedPropertyList;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 99F409C327216B210010500C /* Project object */;
 }

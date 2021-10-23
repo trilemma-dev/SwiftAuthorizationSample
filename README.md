@@ -34,7 +34,6 @@ Three Swift frameworks were created specifically for this helper tool use case:
   - Designed specifically for secure XPC Mach Services communication, which by default has no restrictions
 - [EmbeddedPropertyList](https://github.com/trilemma-dev/EmbeddedPropertyList): Embedded property list reader
   - Directly read the info and launchd property lists embedded in the helper tool
-  - This is a dependency for SecureXPC
 
 Each of these frameworks have their own READMEs as well as full DocC documentation.
 
