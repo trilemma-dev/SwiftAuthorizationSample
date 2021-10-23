@@ -16,7 +16,7 @@ APP_BUNDLE_IDENTIFIER = com.example.SwiftAuthorizationApp
 APP_TARGET_DIRECTORY = SwiftAuthorizationApp
 APP_TARGET_NAME = SwiftAuthorizationApp
 
-HELPER_TOOL_BUNDLE_IDENTIFIER = com.example.SwiftAuthorizationApp.helper
+HELPER_TOOL_BUNDLE_IDENTIFIER = $(APP_BUNDLE_IDENTIFIER).helper
 HELPER_TOOL_TARGET_DIRECTORY = SwiftAuthorizationHelperTool
 
 // Setting a minimum deployment targer less than 10.14.4 means the Swift 5 Runtime Support for Command Line Tools
@@ -36,6 +36,6 @@ SHARED_DIRECTORY = SHARED
 // There should never be a need to modify anything below this line in this configuration file
 
 
-// Required for notarization. Protects the app from classes of exploits, like code injection, dynamically linked library
-// (DLL) hijacking, and process memory space tampering
+// Required for notarization. Protects from classes of exploits, like code injection, dynamically linked library (DLL)
+// hijacking, and process memory space tampering
 ENABLE_HARDENED_RUNTIME = YES
