@@ -7,6 +7,7 @@
 
 import Cocoa
 import Blessed
+import SecureXPC
 
 class ViewController: NSViewController {
     
@@ -19,9 +20,18 @@ class ViewController: NSViewController {
     @IBOutlet weak var outputText: NSTextView!
     
     private var monitor: HelperToolMonitor?
+    private var xpcClient: XPCMachClient?
+    private var authorization: Authorization?
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Command pop options
+        for command in AllowedCommand.allCases {
+            let menuItem = NSMenuItem(title: command.displayName, action: nil, keyEquivalent: "")
+            menuItem.representedObject = command
+            commandPopup.menu?.addItem(menuItem)
+        }
         
         // Output text field
         outputText.font = NSFont.userFixedPitchFont(ofSize: 11)
@@ -35,6 +45,8 @@ class ViewController: NSViewController {
             self.updateInstallUI(status: monitor.determineStatus())
             monitor.start(changeOccurred: updateInstallUI)
             self.monitor = monitor
+            
+            self.xpcClient = XPCMachClient(machServiceName: sharedConstants.machServiceName)
         }
     }
     
@@ -98,7 +110,7 @@ class ViewController: NSViewController {
                     }
                 } else {
                     // Registered: no | Registration file: no | Helper tool: yes
-                    if status.registrationPropertyListExists {
+                    if status.helperToolExists {
                         self.installedField.stringValue = "No (helper tool exists)"
                         self.installOrUpdateButton.title = "Install"
                         self.installOrUpdateButton.action = #selector(ViewController.install)
@@ -127,14 +139,76 @@ class ViewController: NSViewController {
     }
     
     @objc func update(_ sender: NSButton) {
-        print("update")
+        if let xpcClient = xpcClient,
+           let sharedConstants = (NSApplication.shared.delegate as? AppDelegate)?.sharedConstants,
+           let bundledLocation = sharedConstants.bundledLocation {
+            do {
+                try xpcClient.sendMessage(bundledLocation, route: SharedConstants.updateRoute)
+            } catch {
+                print("unable to send update message: \(error)")
+            }
+        } else {
+            print("unable to send update message")
+        }
     }
     
     @IBAction func uninstall(_ sender: NSButton) {
-        
+        if let xpcClient = xpcClient {
+            do {
+                try xpcClient.send(route: SharedConstants.uninstallRoute)
+            } catch {
+                print("unable to send uninstall message: \(error)")
+            }
+        } else {
+            print("unable to send uninstall message")
+        }
     }
     
     @IBAction func run(_ sender: NSButton) {
+        self.outputText.string = ""
         
+        if let command = commandPopup.selectedItem?.representedObject as? AllowedCommand,
+           let xpcClient = self.xpcClient {
+            do {
+                if self.authorization == nil {
+                    self.authorization = try Authorization()
+                }
+                try xpcClient.sendMessage(AllowedCommandMessage(command: command, authorization: self.authorization),
+                                          route: SharedConstants.allowedCommandRoute,
+                                          withReply: displayAllowedCommandResponse(_:))
+            } catch {
+                DispatchQueue.main.async {
+                    self.outputText.textColor = NSColor.systemRed
+                    self.outputText.string = String(describing: error)
+                }
+            }
+        } else {
+            self.outputText.textColor = NSColor.systemRed
+            self.outputText.string = "Unable to communicate with helper tool"
+        }
+    }
+    
+    private func displayAllowedCommandResponse(_ result: Result<AllowedCommandReply, XPCError>) {
+        DispatchQueue.main.async {
+            switch result {
+                case let .success(reply):
+                    if let standardOutput = reply.standardOutput {
+                        self.outputText.textColor = NSColor.white
+                        self.outputText.string = standardOutput
+                    } else if let standardError = reply.standardError {
+                        self.outputText.textColor = NSColor.systemRed
+                        self.outputText.string = standardError
+                    } else {
+                        self.outputText.string = ""
+                    }
+                case let .failure(error):
+                    self.outputText.textColor = NSColor.systemRed
+                    if case let .remote(description) = error {
+                        self.outputText.string = description
+                    } else {
+                        self.outputText.string = String(describing: error)
+                    }
+            }
+        }
     }
 }

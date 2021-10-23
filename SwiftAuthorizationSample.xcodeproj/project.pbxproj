@@ -20,6 +20,12 @@
 		99A67B4E2724125200F7D92D /* HelperToolInfoPropertyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B4C2724125200F7D92D /* HelperToolInfoPropertyList.swift */; };
 		99A67B502724134800F7D92D /* SharedConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B4F2724134800F7D92D /* SharedConstants.swift */; };
 		99A67B512724134800F7D92D /* SharedConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B4F2724134800F7D92D /* SharedConstants.swift */; };
+		99A67B53272439E400F7D92D /* AllowedCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B52272439E400F7D92D /* AllowedCommand.swift */; };
+		99A67B54272439E400F7D92D /* AllowedCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B52272439E400F7D92D /* AllowedCommand.swift */; };
+		99A67B5627243F6E00F7D92D /* Uninstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B5527243F6E00F7D92D /* Uninstaller.swift */; };
+		99A67B5827243FD800F7D92D /* CodeInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B5727243FD800F7D92D /* CodeInfo.swift */; };
+		99A67B5A2724413300F7D92D /* AllowedCommandRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B592724413300F7D92D /* AllowedCommandRunner.swift */; };
+		99A67B5C2724416C00F7D92D /* Updater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B5B2724416C00F7D92D /* Updater.swift */; };
 		99F409CF27216B210010500C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99F409CE27216B210010500C /* AppDelegate.swift */; };
 		99F409D127216B210010500C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99F409D027216B210010500C /* ViewController.swift */; };
 		99F409D327216B230010500C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 99F409D227216B230010500C /* Assets.xcassets */; };
@@ -55,6 +61,11 @@
 		99A67B492724111200F7D92D /* HelperToolLaunchdPropertyList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperToolLaunchdPropertyList.swift; sourceTree = "<group>"; };
 		99A67B4C2724125200F7D92D /* HelperToolInfoPropertyList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperToolInfoPropertyList.swift; sourceTree = "<group>"; };
 		99A67B4F2724134800F7D92D /* SharedConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedConstants.swift; sourceTree = "<group>"; };
+		99A67B52272439E400F7D92D /* AllowedCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllowedCommand.swift; sourceTree = "<group>"; };
+		99A67B5527243F6E00F7D92D /* Uninstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Uninstaller.swift; sourceTree = "<group>"; };
+		99A67B5727243FD800F7D92D /* CodeInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeInfo.swift; sourceTree = "<group>"; };
+		99A67B592724413300F7D92D /* AllowedCommandRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllowedCommandRunner.swift; sourceTree = "<group>"; };
+		99A67B5B2724416C00F7D92D /* Updater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Updater.swift; sourceTree = "<group>"; };
 		99F409CB27216B210010500C /* SwiftAuthorizationApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftAuthorizationApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		99F409CE27216B210010500C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		99F409D027216B210010500C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -134,8 +145,8 @@
 				99F409CE27216B210010500C /* AppDelegate.swift */,
 				99A67B4727240DB100F7D92D /* HelperToolMonitor.swift */,
 				99F409D027216B210010500C /* ViewController.swift */,
-				99F409D227216B230010500C /* Assets.xcassets */,
 				99F409D427216B230010500C /* Main.storyboard */,
+				99F409D227216B230010500C /* Assets.xcassets */,
 			);
 			path = SwiftAuthorizationApp;
 			sourceTree = "<group>";
@@ -147,6 +158,10 @@
 				99F409F6272304B20010500C /* Info.plist */,
 				99F409F7272304C20010500C /* launchd.plist */,
 				99F409E327216BFF0010500C /* main.swift */,
+				99A67B5527243F6E00F7D92D /* Uninstaller.swift */,
+				99A67B5B2724416C00F7D92D /* Updater.swift */,
+				99A67B5727243FD800F7D92D /* CodeInfo.swift */,
+				99A67B592724413300F7D92D /* AllowedCommandRunner.swift */,
 			);
 			path = SwiftAuthorizationHelperTool;
 			sourceTree = "<group>";
@@ -162,9 +177,10 @@
 		99F409F52723049E0010500C /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				99A67B492724111200F7D92D /* HelperToolLaunchdPropertyList.swift */,
-				99A67B4C2724125200F7D92D /* HelperToolInfoPropertyList.swift */,
+				99A67B52272439E400F7D92D /* AllowedCommand.swift */,
 				99A67B4F2724134800F7D92D /* SharedConstants.swift */,
+				99A67B4C2724125200F7D92D /* HelperToolInfoPropertyList.swift */,
+				99A67B492724111200F7D92D /* HelperToolLaunchdPropertyList.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -354,6 +370,7 @@
 				99A67B4A2724111200F7D92D /* HelperToolLaunchdPropertyList.swift in Sources */,
 				99F409D127216B210010500C /* ViewController.swift in Sources */,
 				99F409CF27216B210010500C /* AppDelegate.swift in Sources */,
+				99A67B53272439E400F7D92D /* AllowedCommand.swift in Sources */,
 				99A67B4D2724125200F7D92D /* HelperToolInfoPropertyList.swift in Sources */,
 				99A67B502724134800F7D92D /* SharedConstants.swift in Sources */,
 				99A67B4827240DB100F7D92D /* HelperToolMonitor.swift in Sources */,
@@ -365,8 +382,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				99A67B512724134800F7D92D /* SharedConstants.swift in Sources */,
+				99A67B5627243F6E00F7D92D /* Uninstaller.swift in Sources */,
 				99A67B4B2724111200F7D92D /* HelperToolLaunchdPropertyList.swift in Sources */,
+				99A67B54272439E400F7D92D /* AllowedCommand.swift in Sources */,
 				99A67B4E2724125200F7D92D /* HelperToolInfoPropertyList.swift in Sources */,
+				99A67B5C2724416C00F7D92D /* Updater.swift in Sources */,
+				99A67B5827243FD800F7D92D /* CodeInfo.swift in Sources */,
+				99A67B5A2724413300F7D92D /* AllowedCommandRunner.swift in Sources */,
 				99F409E427216BFF0010500C /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

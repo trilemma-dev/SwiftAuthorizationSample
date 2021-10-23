@@ -261,6 +261,25 @@ manually update an installed helper tool. If your app would like to automaticall
 user involvement see SwiftAuthorizationHelperTool/Update.swift for an example of how to do so. Note that this updater
 has certain self-imposed restrictions and will not perform an update in all circumstances.
 
+## Debugging a Helper Tool
+The helper tool is run by launchd, not Xcode, and therefore can be challenging to debug. A reliable way to debug it
+is to use [`NSLog`](https://developer.apple.com/documentation/foundation/1395275-nslog) as seen throughout the helper
+tool's code. The output of these log statements can be viewed in 
+[Console.app](https://support.apple.com/guide/console/welcome/mac), and it's recommended you filter the output to just
+that coming from the helper tool's process. Note that `print` statements will not be viewable in Console.app, `NSLog`
+must be used.
+
+If you get the helper tool into a bad state, it may be helpful to uninstall it. You can uninstall the helper tool from
+the command line by passing it the `uninstall` argument. You will need to use `sudo` to do this:
+`sudo /Library/PrivilegedHelperTools/com.example.SwiftAuthorizationApp.helper uninstall`
+
+If the helper tool is sufficiently broken that it can't handle uninstalling itself, you can do so manually:
+```
+sudo launchctl unload /Library/LaunchDaemons/com.example.SwiftAuthorizationApp.helper.plist
+sudo rm -f /Library/LaunchDaemons/com.example.SwiftAuthorizationApp.helper.plist
+sudo rm -f /Library/PrivilegedHelperTools/com.example.SwiftAuthorizationApp.helper
+```
+
 ## App Architecture & UI
 The sample app's architecture and UI are not meant to serve as examples of how to best build a macOS app. Please
 consult other resources for such guidance.

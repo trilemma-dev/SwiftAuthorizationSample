@@ -1,6 +1,6 @@
 //
 //  HelperToolMonitor.swift
-//  SwiftAuthorizationApp
+//  SwiftAuthorizationSample
 //
 //  Created by Josh Kaplan on 2021-10-23
 //
@@ -95,6 +95,8 @@ class HelperToolMonitor {
         let registrationPropertyListExists = FileManager.default
                                                         .fileExists(atPath: constants.blessedPropertyListLocation.path)
         
+        print(constants.blessedLocation)
+        
         let helperToolBundleVersion: Version?
         let helperToolExists: Bool
         do {
@@ -102,9 +104,12 @@ class HelperToolMonitor {
             helperToolBundleVersion = infoPropertyList.version
             helperToolExists = true
         } catch {
+            print("catched: \(error)")
             helperToolBundleVersion = nil
             helperToolExists = false
         }
+        
+        print(helperToolExists)
         
         return InstallationStatus(registeredWithLaunchd: registeredWithLaunchd,
                                   registrationPropertyListExists: registrationPropertyListExists,

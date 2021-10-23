@@ -19,6 +19,17 @@ struct SharedConstants {
         case missingSMPrivilegedExecutables
     }
     
+    /// Authorization right used to force user to authenticate as admin before performing an action.
+    static let exampleRight = AuthorizationRight(name: "com.example.SwiftAuthorizationSample.secure-action")
+    /// XPC route to run an allowed command as root.
+    static let allowedCommandRoute = XPCRouteWithMessageWithReply("process",
+                                                                  messageType: AllowedCommandMessage.self,
+                                                                  replyType: AllowedCommandReply.self)
+    /// XPC route to uninstall the helper tool.
+    static let uninstallRoute = XPCRouteWithoutMessageWithoutReply("uninstall")
+    /// XPC route to update the helper tool.
+    static let updateRoute = XPCRouteWithMessageWithoutReply("update", messageType: URL.self)
+    
     /// The label of the helper tool. This is required by SMJobBless to match its filename.
     let helperToolLabel: String
     /// The name of the Mach Service registered by the helper tool. If there are multiple registered Mach Services, this is set to the name of the first one.
