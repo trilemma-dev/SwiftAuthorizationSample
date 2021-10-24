@@ -22,8 +22,12 @@ ENABLE_APP_SANDBOX = NO
 // Info property list
 INFOPLIST_FILE = $(APP_TARGET_DIRECTORY)/Info.plist
 GENERATE_INFOPLIST_FILE = YES
+INFOPLIST_KEY_LSApplicationCategoryType = public.app-category.developer-tools
 INFOPLIST_KEY_CFBundleName = $(APP_TARGET_NAME)
 INFOPLIST_KEY_CFBundleExecutable = $(APP_TARGET_NAME)
 // These entries are specific to this sample using a Storyboard
 INFOPLIST_KEY_NSMainStoryboardFile = Main
 INFOPLIST_KEY_NSPrincipalClass = NSApplication
+
+// Tells Xcode Archive the app is the target which should be the installable artifact (unlike the helper tool)
+SKIP_INSTALL = NO

@@ -30,7 +30,7 @@ MACOSX_DEPLOYMENT_TARGET = 10.14.4
 
 
 // Directory containing app-specific code shared by both the app and helper tool
-SHARED_DIRECTORY = SHARED
+SHARED_DIRECTORY = Shared
 
 
 // There should never be a need to modify anything below this line in this configuration file

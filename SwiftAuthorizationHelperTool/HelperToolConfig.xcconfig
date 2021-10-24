@@ -24,3 +24,6 @@ LAUNCHDPLIST_FILE = $(HELPER_TOOL_TARGET_DIRECTORY)/launchd.plist
 // Note that CREATE_INFOPLIST_SECTION_IN_BINARY = YES can't be used to inline the info property list because this step
 // occurs immediately *before* any scripts are run, preventing the property list from being modified
 OTHER_LDFLAGS = -sectcreate __TEXT __info_plist $(INFOPLIST_FILE) -sectcreate __TEXT __launchd_plist $(LAUNCHDPLIST_FILE)
+
+// Tells Xcode Archive the helper tool should be an installable artifact (the app should be)
+SKIP_INSTALL = YES

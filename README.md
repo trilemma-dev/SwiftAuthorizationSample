@@ -173,36 +173,36 @@ In your `xcodeproj` file:
 1. Select your app target
 2. Switch to the Build Phases tab
 3. Add a Run Script Phase which occurs right after Dependencies
-4. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift satisfyJobBlessRequirements`
+4. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift satisfy-job-bless-requirements`
 
 This will add the `SMPrivilegedExecutables` entry to your app's Info.plist each time the app is built either for debug
-or release. Because this value will differ depending on the build, you may not want your Info.plist to keep changing and
-have these changes committed your repository. To prevent this, you can do the following optional steps:
+or release. If you do want this auto-generated value to be persisted after the build process, take these optional steps:
 
 5. Add a Run Script Phase as the last phase
-6. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift cleanupJobBlessRequirements`
+6. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift cleanup-job-bless-requirements`
 
-This will delete the `SMPrivilegedExecutables` entry from your app's Info.plist at the end of the build process.
+This will delete the `SMPrivilegedExecutables` entry from your app's Info.plist at the end of the build process. The
+sample is configured to do perform this clean up step.
 
 Next we'll configure the build script to run for the helper tool:
 1. Select your helper tool target
 2. Switch to the Build Phases tab
 3. Add a Run Script Phase which occurs right after the Dependencies Phase
 4. Set the command to be run as
-   `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift satisfyJobBlessRequirements autoIncrementVersion`
+   `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift satisfy-job-bless-requirements auto-increment-version`
    
-By specifying "satisfyJobBlessRequirements", the script will add the `SMAuthorizedClients` entry to the helper tool's
+By specifying "satisfy-job-bless-requirements", the script will add the `SMAuthorizedClients` entry to the helper tool's
 info property list and the `Label` entry to the launchd property list each time the app is built either for debug or
 release. If you do not want these entries to be persisted as part of the Info.plist:
 
 5. Add a Run Script Phase as the last phase
-6. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift cleanupJobBlessRequirements`
+6. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift cleanup-job-bless-requirements`
 
-By specifying "autoIncrementVersion", the script will increment the patch value of the `CFBundleVersion` entry if the 
+By specifying "auto-increment-version", the script will increment the patch value of the `CFBundleVersion` entry if the 
 source code has changed. In order for the script to determine if the source code has changed it creates an entry in your
 helper tool's info property list with the `BuildHash` key and a value equal to the SHA256 hash of the helper tool's
 source code. In order for the version number to continue autoincrementing you'll need to commit these changes. If you do
-not want this autoincrement behavior, do not specify `autoIncrementVersion` as an argument for the build script. 
+not want this autoincrement behavior, do not specify `auto-increment-version` as an argument for the build script. 
 
 ## Communicating With a Helper Tool
 Communication between your app and the helper tool should be thought of as a client server relationship.  Your app
@@ -228,8 +228,8 @@ does not support this — it only sends serializable data.
 
 ### Registering an XPC Mach Server
 For the helper tool to be an XPC Mach server, it must register to be one in its launchd property list. The build script
-can do this for you automatically be adding the "specifyMachServices" argument. If you want this to be cleaned up at
-the end of the build process, then for that Run Script phase add the "cleanupMachServices" argument.
+can do this for you automatically be adding the "specify-mach-services" argument. If you want this to be cleaned up at
+the end of the build process, then for that Run Script Phase add the "cleanup-mach-services" argument.
 
 The script will set the service name to be the same as its bundle identifier, which in practice will also be its
 filename and the value for `Label`. This is done purely for convenience; there is no requirement the service name use
@@ -279,6 +279,10 @@ sudo launchctl unload /Library/LaunchDaemons/com.example.SwiftAuthorizationApp.h
 sudo rm -f /Library/LaunchDaemons/com.example.SwiftAuthorizationApp.helper.plist
 sudo rm -f /Library/PrivilegedHelperTools/com.example.SwiftAuthorizationApp.helper
 ```
+
+The `launchctl unload` command may fail if the helper tool is still running. If so, you can terminate it with Activity
+Monitor.
+
 
 ## App Architecture & UI
 The sample app's architecture and UI are not meant to serve as examples of how to best build a macOS app. Please

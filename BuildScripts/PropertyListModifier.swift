@@ -7,28 +7,26 @@
 //
 
 // This script generates all of the property list requirements needed by SMJobBless and XPC Mach Services in conjunction
-// with user defined variables specified in the xcconfig files. This involves adding/removing entries to:
-//  - Apps's Info property list
-//  - Helper tools's Info property list
-//  - Helper tools's launchd property list
+// with user defined variables specified in the xcconfig files. This scripts adds/modifies/removes entries to:
+//  - App's info property list
+//  - Helper tool's info property list
+//  - Helper tool's launchd property list
 //
-// By default, this script is run both at the beginning and end of the build process for both targets. When run at the
-// end it undoes all of the property list requirement changes it applied to satisfy SMJobBless.
+// For this sample, this script is run both at the beginning and end of the build process for both targets. When run at
+// the end it deletes all of the property list requirement changes it applied. For your own project you may not find it
+// useful to do this cleanup task at the end of the build process.
 //
-// There are two other functions this script can perform:
-//  - Adds a MachServices entry to the helper tool's launchd property list
-//      - This allows for the helper tool to be communicated with over XPC
-//      - This entry can also be removed at the end of the build process
-//  - Auto-increments the helper tools's version number whenever its source code changes
-//      - SMJobBless will only successfully install a new helper tool over an existing one if its version is greater
-//      - In order to track changes, a BuildHash entry will be added to the helper tool's Info property list
+// Additionally this script can auto-increment the helper tools's version number whenever the source code changes
+//  - SMJobBless will only successfully install a new helper tool over an existing one if its version is greater
+//  - In order to track changes, a BuildHash entry will be added to the helper tool's Info property list
+//  - This sample is configured by default to perform this auto-increment
 //
 // All of these options are configured by passing in command line arguments to this script. See ScriptTask for details.
 
 import Foundation
 import CryptoKit
 
-/// Errors raised throughout this script
+/// Errors raised throughout this script.
 enum ScriptError: Error {
     case general(String)
     case wrapped(String, Error)
@@ -36,12 +34,12 @@ enum ScriptError: Error {
 
 // MARK: helper functions to read environment variables
 
-/// Attempts to read an environment variable, throws an error if it is not present
+/// Attempts to read an environment variable, throws an error if it is not present.
 ///
 /// - Parameters:
-///   - name: name of the environment variable
-///   - description: a description of what was trying to be read; used in the error message if one is thrown
-///   - isUserDefined: whether the environment variable is user defined; used to modify the error message if one is thrown
+///   - name: Name of the environment variable.
+///   - description: A description of what was trying to be read; used in the error message if one is thrown.
+///   - isUserDefined: Whether the environment variable is user defined; used to modify the error message if one is thrown.
 func readEnvironmentVariable(name: String, description: String, isUserDefined: Bool) throws -> String {
     if let value = ProcessInfo.processInfo.environment[name] {
         return value
@@ -51,12 +49,11 @@ func readEnvironmentVariable(name: String, description: String, isUserDefined: B
             message += " This is a user-defined variable. Please check that the xcconfig files are present and " +
                        "configured in the project settings."
         }
-        
         throw ScriptError.general(message)
     }
 }
 
-/// Attempts to read an environment variable as a URL
+/// Attempts to read an environment variable as a URL.
 func readEnvironmentVariableAsURL(name: String, description: String, isUserDefined: Bool) throws -> URL {
     let value = try readEnvironmentVariable(name: name, description: description, isUserDefined: isUserDefined)
     
@@ -65,161 +62,79 @@ func readEnvironmentVariableAsURL(name: String, description: String, isUserDefin
 
 // MARK: property list keys
 
-/// Key for entry in helper tool's launchd property list
-let LabelKey = "Label"
-
-/// Key for entry in app's info property list
-let SMPrivilegedExecutablesKey = "SMPrivilegedExecutables"
-
-/// Key for entry in helper tool's info property list
+// Helper tool - info
+/// Key for entry in helper tool's info property list.
 let SMAuthorizedClientsKey = "SMAuthorizedClients"
-
-/// Key for bundle identifier
+/// Key for bundle identifier.
 let CFBundleIdentifierKey = kCFBundleIdentifierKey as String
-
-/// Key for bundle version
+/// Key for bundle version.
 let CFBundleVersionKey = kCFBundleVersionKey as String
-
-/// Key for XPC mach service used by the helper tool
-let MachServicesKey = "MachServices"
-
 /// Custom key for an entry in the helper tool's info plist that contains a hash of source files. Used to detect when the build changes.
 let BuildHashKey = "BuildHash"
 
-// MARK: Object Identifiers (OID) describing code signing certificates and associated certificate representations
+// Helper tool - launchd
+/// Key for entry in helper tool's launchd property list.
+let LabelKey = "Label"
+/// Key for XPC mach service used by the helper tool.
+let MachServicesKey = "MachServices"
 
-/// Certificate used by Mac App Store apps
-///
-/// Mac App Store Application Software Signing, documented in section "4.11.8. Mac App Store Application Certificates"
-/// Apple Inc. Certification Practice Statement Worldwide Developer Relations
-/// Version 1.25, Effective Date: August 10, 2021
-/// https://images.apple.com/certificateauthority/pdf/Apple_WWDR_CPS_v1.25.pdf
-let oidAppleMacAppStoreApplication = "1.2.840.113635.100.6.1.9"
-
-/// Intermediate certificate used by Developer ID macOS apps (as well as macOS installers)
-///
-/// Documented in  SecPolicyCreateAppleExternalDeveloper function in SecPolicyPriv.h
-/// Found at https://opensource.apple.com/source/Security/Security-57740.51.3/trust/SecPolicyPriv.h
-let oidAppleDeveloperIDCA = "1.2.840.113635.100.6.2.6"
-
-/// Development team's leaf certificate used to sign Developer ID macOS apps
-///
-/// Apple Custom Extension, documented in section "4.11.2.Application Code Signing Certificates"
-/// Apple Inc. Certification Practice Statement Developer ID
-/// Version 3.2, Effective Date: June 2, 2021
-/// https://images.apple.com/certificateauthority/pdf/Apple_Developer_ID_CPS_v3.2.pdf
-let oidAppleDeveloperIDApplication = "1.2.840.113635.100.6.1.13"
-
-/// Intermediate certificate used for most Apple development including "Apple Development" and "Mac Development" used when building apps as part of
-/// development workflows not intended for distribution
-let oidAppleWWDRIntermediate = kSecOIDAPPLE_EXTENSION_WWDR_INTERMEDIATE // 1.2.840.113635.100.6.2.1
+// App - info
+/// Key for entry in app's info property list.
+let SMPrivilegedExecutablesKey = "SMPrivilegedExecutables"
 
 // MARK: code signing requirements
 
-let appleDeveloperID = "certificate leaf[field.\(oidAppleMacAppStoreApplication)] /* exists */ " +
-                       "or certificate 1[field.\(oidAppleDeveloperIDCA)] /* exists */ " +
-                       "and certificate leaf[field.\(oidAppleDeveloperIDApplication)] /* exists */"
-
-let appleMacDeveloper = "certificate 1[field.\(oidAppleWWDRIntermediate)] /* exists */"
-
-let appleGeneric = "anchor apple generic"
-
-func appleDevelopment() throws -> String {
-    let appleDevelopmentCN = try readEnvironmentVariable(name: "EXPANDED_CODE_SIGN_IDENTITY_NAME",
-                                                         description: "expanded code sign identity name",
-                                                         isUserDefined: false)
-    let regex = #"^Apple\ Development:\ .*\ \([A-Z0-9]{10}\)$"#
-    guard appleDevelopmentCN.range(of: regex, options: .regularExpression) != nil else {
-        if appleDevelopmentCN == "-" {
-            throw ScriptError.general("Signing Team for Debug is set to None")
+/// A requirement that the organizational unit for the leaf certificate match the development team identifier.
+///
+/// The leaf certificate is the one which corresponds to your developer certificate. The certificates above it in the chain are Apple's.
+/// Depending on whether this build is signed for debug or release the leaf certificate *will* differ, but the organizational unit, represented by `subject.OU` in
+/// the function, will remain the same.
+func organizationalUnitLeafCertificate() throws -> String {
+    let developmentTeamId = try readEnvironmentVariable(name: "DEVELOPMENT_TEAM",
+                                                        description: "development team",
+                                                        isUserDefined: false)
+    guard developmentTeamId.range(of: #"^[A-Z0-9]{10}$"#, options: .regularExpression) != nil else {
+        if developmentTeamId == "-" {
+            throw ScriptError.general("Signing Team is not set")
         } else {
-            throw ScriptError.general("Signing Team for Debug is invalid: \(appleDevelopmentCN)")
+            throw ScriptError.general("Signing Team Id is invalid: \(developmentTeamId)")
         }
     }
-    let certificateString = "certificate leaf[subject.CN] = \"\(appleDevelopmentCN)\""
+    let certificateString = "certificate leaf[subject.OU] = \(developmentTeamId)"
     
     return certificateString
 }
 
-func developerID() throws -> String {
-    let developmentTeam = try readEnvironmentVariable(name: "DEVELOPMENT_TEAM",
-                                                      description: "development team",
-                                                      isUserDefined: false)
-    guard developmentTeam.range(of: #"^[A-Z0-9]{10}$"#, options: .regularExpression) != nil else {
-        if developmentTeam == "-" {
-            throw ScriptError.general("Signing Team for Release is set to None")
-        } else {
-            throw ScriptError.general("Signing Team for Release is invalid: \(developmentTeam)")
-        }
-    }
-    let certificateString = "certificate leaf[subject.OU] = \(developmentTeam)"
+/// Creates a `SMAuthorizedClients` entry representing the app which must go inside the helper tool's info property list.
+func SMAuthorizedClientsEntry() throws -> (key: String, value: [String]) {
+    let appIdentifier = "identifier \"\(try TargetType.app.bundleIdentifier())\""
+    let requirements = [appIdentifier, try organizationalUnitLeafCertificate()]
+    let value = [requirements.joined(separator: " and ")]
     
-    return certificateString
+    return (SMAuthorizedClientsKey, value)
 }
 
-func identifierApp() throws -> String {
-    return "identifier \"\(try TargetType.app.bundleIdentifier())\""
-}
-
-func identifierHelperTool() throws -> String {
-    return "identifier \"\(try TargetType.helperTool.bundleIdentifier())\""
-}
-
-/// Creates a `SMAuthorizedClients` entry representing the app which must go inside the helper tool's info property list
-///
-/// - Returns: entry with key `SMAuthorizedClients` and value matching output of: `codesign -d -r - <app bundle>`
-func SMAuthorizedClientsEntry(forAction action: ActionType) throws -> (key: String, value: [String]) {
-    let requirements: [String]
-    switch action {
-        case .build:
-            requirements = [try identifierApp(), appleGeneric, try appleDevelopment(), appleMacDeveloper]
-        case .install:
-            requirements = [appleGeneric, try identifierApp(), "(\(appleDeveloperID) and \(try developerID()))"]
-        default:
-            throw ScriptError.general("Unsupported action")
-    }
+/// Creates a `SMPrivilegedExecutables` entry representing the helper tool which must go inside the app's info property list.
+func SMPrivilegedExecutablesEntry() throws -> (key: String, value: [String : String]) {
+    let helperToolIdentifier = "identifier \"\(try TargetType.helperTool.bundleIdentifier())\""
+    let requirements = [helperToolIdentifier, try organizationalUnitLeafCertificate()]
+    let value = [try TargetType.helperTool.bundleIdentifier() : requirements.joined(separator: " and ")]
     
-    return (key: SMAuthorizedClientsKey, value: [requirements.joined(separator: " and ")])
+    return (SMPrivilegedExecutablesKey, value)
 }
 
-/// Creates a `SMPrivilegedExecutables` entry representing the helper tool which must go inside the app's info property list
-///
-/// - Returns: entry with key `SMPrivilegedExecutables` and value a dictionary of one element, with the key for helper tool label and the value
-///            matching output of: `codesign -d -r - <helper tool>`
-func SMPrivilegedExecutablesEntry(forAction action: ActionType) throws -> (key: String, value: [String : String]) {
-    let requirements: [String]
-    switch action {
-        case .build:
-            requirements = [try identifierHelperTool(),
-                            appleGeneric,
-                            try appleDevelopment(),
-                            appleMacDeveloper]
-        case .install:
-            requirements = [appleGeneric,
-                            try identifierHelperTool(),
-                            "(\(appleDeveloperID) and \(try developerID()))"]
-        default:
-            throw ScriptError.general("Unsupported action")
-    }
-    
-    return (key: SMPrivilegedExecutablesKey,
-            value: [try TargetType.helperTool.bundleIdentifier() : requirements.joined(separator: " and ")])
-}
-
-/// Creates a `Label` entry which must go inside the helper tool's launchd property list
-///
-/// - Returns: entry with key `Label` and value for the helper tool's label
+/// Creates a `Label` entry which must go inside the helper tool's launchd property list.
 func LabelEntry() throws -> (key: String, value: String) {
     return (key: LabelKey, value: try TargetType.helperTool.bundleIdentifier())
 }
 
 // MARK: property list manipulation
 
-/// Reads the property list at the provided path
+/// Reads the property list at the provided path.
 ///
 /// - Parameters:
-///   - atPath: where the property list is located
-/// - Returns: tuple containing entries and the format of the on disk property list
+///   - atPath: Where the property list is located.
+/// - Returns: Tuple containing entries and the format of the on disk property list.
 func readPropertyList(atPath path: URL) throws -> (entries: NSMutableDictionary,
                                                    format: PropertyListSerialization.PropertyListFormat) {
     let onDiskPlistData: Data
@@ -246,12 +161,12 @@ func readPropertyList(atPath path: URL) throws -> (entries: NSMutableDictionary,
     }
 }
 
-/// Writes (or overwrites) a property list at the provided path
+/// Writes (or overwrites) a property list at the provided path.
 ///
 /// - Parameters:
-///   - atPath: where the property list should be written
-///   - entries: total of entries to be written to the property list
-///   - format: the format to use when writing entries into the Info.plist on disk
+///   - atPath: Where the property list should be written.
+///   - entries: All entries to be written to the property list, this does not append - it overwrites anything existing.
+///   - format:The format to use when writing entries to `atPath`.
 func writePropertyList(atPath path: URL,
                        entries: NSDictionary,
                        format: PropertyListSerialization.PropertyListFormat) throws {
@@ -272,7 +187,7 @@ func writePropertyList(atPath path: URL,
     }
 }
 
-/// Updates the property list with the provided entries
+/// Updates the property list with the provided entries.
 ///
 /// If an existing entry exists for the given key it will be overwritten. If the property file does not exist, it will be created.
 func updatePropertyListWithEntries(_ newEntries: [String : AnyHashable], atPath path: URL) throws {
@@ -288,7 +203,7 @@ func updatePropertyListWithEntries(_ newEntries: [String : AnyHashable], atPath 
     try writePropertyList(atPath: path, entries: entries, format: format)
 }
 
-/// Updates the property list by removing the provided keys (if present)
+/// Updates the property list by removing the provided keys (if present).
 func removePropertyListEntries(forKeys keys: [String], atPath path: URL) throws {
     let (entries, format) = try readPropertyList(atPath: path)
     for key in keys {
@@ -298,16 +213,14 @@ func removePropertyListEntries(forKeys keys: [String], atPath path: URL) throws 
     try writePropertyList(atPath: path, entries: entries, format: format)
 }
 
-/// The path of the info property list (typically has the name Info.plist)
+/// The path of the info property list for this target.
 func infoPropertyListPath() throws -> URL {
     return try readEnvironmentVariableAsURL(name: "INFOPLIST_FILE",
                                             description: "info property list path",
                                             isUserDefined: true)
 }
 
-/// Finds the path of the launchd property list for the helper tool
-///
-/// This will not work if called when the target is the app. This function relies on an expected "Other Link Flags" value format.
+/// The path of the launchd property list for the helper tool.
 func launchdPropertyListPath() throws -> URL {
     try readEnvironmentVariableAsURL(name: "LAUNCHDPLIST_FILE",
                                      description: "launchd property list path",
@@ -316,7 +229,7 @@ func launchdPropertyListPath() throws -> URL {
 
 // MARK: automatic bundle version updating
 
-/// Hashes Swift source files in the helper tool's directory as well as shared directories
+/// Hashes Swift source files in the helper tool's directory as well as the shared directory.
 ///
 /// - Returns: hash value, hex encoded
 func hashSources() throws -> String {
@@ -350,7 +263,7 @@ func hashSources() throws -> String {
     return digestHex
 }
 
-/// Represents the value corresponding to the key `CFBundleVersionKey` in the info property list
+/// Represents the value corresponding to the key `CFBundleVersionKey` in the info property list.
 struct BundleVersion {
     let version: String
     let major: Int
@@ -400,7 +313,7 @@ struct BundleVersion {
     }
 }
 
-/// Reads the `CFBundleVersion` value from the passed in dictionary
+/// Reads the `CFBundleVersion` value from the passed in dictionary.
 func readBundleVersion(propertyList: NSMutableDictionary) throws -> BundleVersion {
     if let value = propertyList[CFBundleVersionKey] as? String {
         if let version = BundleVersion(version: value) {
@@ -413,12 +326,12 @@ func readBundleVersion(propertyList: NSMutableDictionary) throws -> BundleVersio
     }
 }
 
-/// Reads the `BuildHash` value from the passed in dictionary
+/// Reads the `BuildHash` value from the passed in dictionary.
 func readBuildHash(propertyList: NSMutableDictionary) throws -> String? {
     return propertyList[BuildHashKey] as? String
 }
 
-/// Reads the information property list, determines if the build has changed based on stored hash values, and increments the build version if it has.
+/// Reads the info property list, determines if the build has changed based on stored hash values, and increments the build version if it has.
 func incrementBundleVersionIfNeeded(infoPropertyListPath: URL) throws {
     let propertyList = try readPropertyList(atPath: infoPropertyListPath)
     let previousBuildHash = try readBuildHash(propertyList: propertyList.entries)
@@ -436,11 +349,9 @@ func incrementBundleVersionIfNeeded(infoPropertyListPath: URL) throws {
     }
 }
 
-// MARK: identification of under what conditions this script is being run based on Xcode environment variables
+// MARK: Xcode target
 
-/// The two build targets used as part of `SMJobBless`
-///
-/// If you rename either of these, you *must* update the values below
+/// The two build targets used as part of this sample.
 enum TargetType: String {
     case app = "APP_BUNDLE_IDENTIFIER"
     case helperTool = "HELPER_TOOL_BUNDLE_IDENTIFIER"
@@ -452,9 +363,7 @@ enum TargetType: String {
     }
 }
 
-/// Determines whether this script is running for the app or the helper tool
-///
-/// This relies on the hard coded constants at the top of this file
+/// Determines whether this script is running for the app or the helper tool.
 func determineTargetType() throws -> TargetType {
     let bundleId = try readEnvironmentVariable(name: "PRODUCT_BUNDLE_IDENTIFIER",
                                                description: "bundle id",
@@ -473,51 +382,24 @@ func determineTargetType() throws -> TargetType {
     }
 }
 
-/// The type of build action performed to result in this script being run
-enum ActionType {
-    /// Typically the standard action which occurs when clicking on the "play" button
-    case build
-    /// Typically triggered when creating an Archive
-    case install
-    /// Another build case not handled by this script such as `docbuild`
-    case other(String)
-    
-    init(rawValue: String) {
-        if rawValue == "build" {
-            self = .build
-        } else if rawValue == "install" {
-            self = .install
-        } else {
-            self = .other(rawValue)
-        }
-    }
-}
-
-/// Determines whether this script is being run for a "build" (typical during development) or "install" (typical during Archive)
-func determineActionType() throws -> ActionType {
-    let actionString = try readEnvironmentVariable(name: "ACTION", description: "build action", isUserDefined: false)
-    
-    return ActionType(rawValue: actionString)
-}
-
 // MARK: tasks
 
 /// The tasks this script can perform. They're provided as command line arguments to this script.
 typealias ScriptTask = () throws -> Void
 let scriptTasks: [String : ScriptTask] = [
-    /// Update the plist(s) as needed to satisfy the requirements of SMJobBless
-    "satisfyJobBlessRequirements" : satisfyJobBlessRequirements,
-    /// Clean up changes made to plist(s) to satisfy the requirements of SMJobBless
-    "cleanupJobBlessRequirements" : cleanupJobBlessRequirements,
-    /// Specifies mach services in the helper tool's launchd property list to enable XPC
-    "specifyMachServices" : specifyMachServices,
-    /// Cleans up changes made to mach services in the helper tool's launchd property list to enable XPC
-    "cleanupMachServices" : cleanupMachServices,
-    /// Auto increment the bundle version number; only intended for the privileged helper
-    "autoIncrementVersion" : autoIncrementVersion
+    /// Update the property lists as needed to satisfy the requirements of SMJobBless
+    "satisfy-job-bless-requirements" : satisfyJobBlessRequirements,
+    /// Clean up changes made to property lists to satisfy the requirements of SMJobBless
+    "cleanup-job-bless-requirements" : cleanupJobBlessRequirements,
+    /// Specifies MachServices entry in the helper tool's launchd property list to enable XPC
+    "specify-mach-services" : specifyMachServices,
+    /// Cleans up changes made to Mach Services in the helper tool's launchd property list
+    "cleanup-mach-services" : cleanupMachServices,
+    /// Auto increment the bundle version number; only intended for the helper tool.
+    "auto-increment-version" : autoIncrementVersion
 ]
 
-/// Determines what tasks this script should undertake in based on passed in arguments
+/// Determines what tasks this script should undertake in based on passed in arguments.
 func determineScriptTasks() throws -> [ScriptTask] {
     if CommandLine.arguments.count > 1 {
         var matchingTasks = [ScriptTask]()
@@ -535,14 +417,13 @@ func determineScriptTasks() throws -> [ScriptTask] {
     }
 }
 
-/// Updates the property lists for the app or helper tool to satisfy SMJobBless requirements
+/// Updates the property lists for the app or helper tool to satisfy SMJobBless requirements.
 func satisfyJobBlessRequirements() throws {
-    let action = try determineActionType()
     let target = try determineTargetType()
     let infoPropertyList = try infoPropertyListPath()
     switch target {
         case .helperTool:
-            let clients = try SMAuthorizedClientsEntry(forAction: action)
+            let clients = try SMAuthorizedClientsEntry()
             let infoEntries: [String : AnyHashable] = [CFBundleIdentifierKey : try target.bundleIdentifier(),
                                                        clients.key : clients.value]
             try updatePropertyListWithEntries(infoEntries, atPath: infoPropertyList)
@@ -551,12 +432,12 @@ func satisfyJobBlessRequirements() throws {
             let label = try LabelEntry()
             try updatePropertyListWithEntries([label.key : label.value], atPath: launchdPropertyList)
         case .app:
-            let executables = try SMPrivilegedExecutablesEntry(forAction: action)
+            let executables = try SMPrivilegedExecutablesEntry()
             try updatePropertyListWithEntries([executables.key : executables.value], atPath: infoPropertyList)
     }
 }
 
-/// Removes the requirements from property lists needed to satisfy SMJobBless requirements
+/// Removes the requirements from property lists needed to satisfy SMJobBless requirements.
 func cleanupJobBlessRequirements() throws {
     let target = try determineTargetType()
     let infoPropertyList = try infoPropertyListPath()
@@ -572,7 +453,7 @@ func cleanupJobBlessRequirements() throws {
     }
 }
 
-/// Creates a MachServices entry for the helper tool, fails if called for the app
+/// Creates a MachServices entry for the helper tool, fails if called for the app.
 func specifyMachServices() throws {
     let target = try determineTargetType()
     switch target {
@@ -580,22 +461,22 @@ func specifyMachServices() throws {
             let services = [MachServicesKey: [try TargetType.helperTool.bundleIdentifier() : true]]
             try updatePropertyListWithEntries(services, atPath: try launchdPropertyListPath())
         case .app:
-            throw ScriptError.general("specifyMachServices only available for helper tool")
+            throw ScriptError.general("specify-mach-services only available for helper tool")
     }
 }
 
-/// Removes a MachServices entry for the helper tool, fails if called for the app
+/// Removes a MachServices entry for the helper tool, fails if called for the app.
 func cleanupMachServices() throws {
     let target = try determineTargetType()
     switch target {
         case .helperTool:
             try removePropertyListEntries(forKeys: [MachServicesKey], atPath: try launchdPropertyListPath())
         case .app:
-            throw ScriptError.general("cleanupMachServices only available for helper tool")
+            throw ScriptError.general("cleanup-mach-services only available for helper tool")
     }
 }
 
-/// Increments the helper tool's version, fails if called for the app
+/// Increments the helper tool's version, fails if called for the app.
 func autoIncrementVersion() throws {
     let target = try determineTargetType()
     switch target {
@@ -603,19 +484,15 @@ func autoIncrementVersion() throws {
             let infoPropertyList = try infoPropertyListPath()
             try incrementBundleVersionIfNeeded(infoPropertyListPath: infoPropertyList)
         case .app:
-            throw ScriptError.general("autoIncrementVersion only available for helper tool")
+            throw ScriptError.general("auto-increment-version only available for helper tool")
     }
 }
 
 // MARK: script starts here
 
 do {
-    if case let .other(action) = try determineActionType() {
-        print("warn: Xcode action not supported by JobBless build script: \(action)")
-    } else {
-        for task in try determineScriptTasks() {
-            try task()
-        }
+    for task in try determineScriptTasks() {
+        try task()
     }
 }
 catch ScriptError.general(let message) {

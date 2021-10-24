@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		99662095272557FF00ECE5C7 /* EmbeddedPropertyList in Frameworks */ = {isa = PBXBuildFile; productRef = 99662094272557FF00ECE5C7 /* EmbeddedPropertyList */; };
+		996620972725580A00ECE5C7 /* EmbeddedPropertyList in Frameworks */ = {isa = PBXBuildFile; productRef = 996620962725580A00ECE5C7 /* EmbeddedPropertyList */; };
 		99A67B332723B2D200F7D92D /* SecureXPC in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B322723B2D200F7D92D /* SecureXPC */; };
-		99A67B362723B2E700F7D92D /* EmbeddedPropertyList in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B352723B2E700F7D92D /* EmbeddedPropertyList */; };
 		99A67B392723B2FC00F7D92D /* Blessed in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B382723B2FC00F7D92D /* Blessed */; };
 		99A67B3C2723B30800F7D92D /* Blessed in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B3B2723B30800F7D92D /* Blessed */; };
 		99A67B3E2723B30D00F7D92D /* SecureXPC in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B3D2723B30D00F7D92D /* SecureXPC */; };
-		99A67B402723B31000F7D92D /* EmbeddedPropertyList in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B3F2723B31000F7D92D /* EmbeddedPropertyList */; };
 		99A67B4827240DB100F7D92D /* HelperToolMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B4727240DB100F7D92D /* HelperToolMonitor.swift */; };
 		99A67B4A2724111200F7D92D /* HelperToolLaunchdPropertyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B492724111200F7D92D /* HelperToolLaunchdPropertyList.swift */; };
 		99A67B4B2724111200F7D92D /* HelperToolLaunchdPropertyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B492724111200F7D92D /* HelperToolLaunchdPropertyList.swift */; };
@@ -90,7 +90,7 @@
 			files = (
 				99A67B392723B2FC00F7D92D /* Blessed in Frameworks */,
 				99A67B332723B2D200F7D92D /* SecureXPC in Frameworks */,
-				99A67B362723B2E700F7D92D /* EmbeddedPropertyList in Frameworks */,
+				99662095272557FF00ECE5C7 /* EmbeddedPropertyList in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,7 +100,7 @@
 			files = (
 				99A67B3C2723B30800F7D92D /* Blessed in Frameworks */,
 				99A67B3E2723B30D00F7D92D /* SecureXPC in Frameworks */,
-				99A67B402723B31000F7D92D /* EmbeddedPropertyList in Frameworks */,
+				996620972725580A00ECE5C7 /* EmbeddedPropertyList in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -206,8 +206,8 @@
 			name = SwiftAuthorizationApp;
 			packageProductDependencies = (
 				99A67B322723B2D200F7D92D /* SecureXPC */,
-				99A67B352723B2E700F7D92D /* EmbeddedPropertyList */,
 				99A67B382723B2FC00F7D92D /* Blessed */,
+				99662094272557FF00ECE5C7 /* EmbeddedPropertyList */,
 			);
 			productName = SwiftAuthorizationSample;
 			productReference = 99F409CB27216B210010500C /* SwiftAuthorizationApp.app */;
@@ -231,7 +231,7 @@
 			packageProductDependencies = (
 				99A67B3B2723B30800F7D92D /* Blessed */,
 				99A67B3D2723B30D00F7D92D /* SecureXPC */,
-				99A67B3F2723B31000F7D92D /* EmbeddedPropertyList */,
+				996620962725580A00ECE5C7 /* EmbeddedPropertyList */,
 			);
 			productName = SwiftAuthorizationHelper;
 			productReference = 99F409E127216BFF0010500C /* com.example.SwiftAuthorizationApp.helper */;
@@ -266,8 +266,8 @@
 			mainGroup = 99F409C227216B210010500C;
 			packageReferences = (
 				99A67B312723B2D200F7D92D /* XCRemoteSwiftPackageReference "SecureXPC" */,
-				99A67B342723B2E700F7D92D /* XCRemoteSwiftPackageReference "EmbeddedPropertyList" */,
 				99A67B372723B2FC00F7D92D /* XCRemoteSwiftPackageReference "Blessed" */,
+				99662093272557FF00ECE5C7 /* XCRemoteSwiftPackageReference "EmbeddedPropertyList" */,
 			);
 			productRefGroup = 99F409CC27216B210010500C /* Products */;
 			projectDirPath = "";
@@ -307,7 +307,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift satisfyJobBlessRequirements\n";
+			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift satisfy-job-bless-requirements\n";
 		};
 		99F409F0272303D10010500C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -324,7 +324,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift cleanupJobBlessRequirements\n";
+			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift cleanup-job-bless-requirements\n";
 		};
 		99F409F1272303E00010500C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -341,7 +341,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift satisfyJobBlessRequirements specifyMachServices autoIncrementVersion\n\n";
+			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift satisfy-job-bless-requirements specify-mach-services auto-increment-version\n\n";
 		};
 		99F409F2272303F20010500C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -358,7 +358,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift cleanupJobBlessRequirements cleanupMachServices\n";
+			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift cleanup-job-bless-requirements cleanup-mach-services\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -459,7 +459,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.3;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -516,7 +515,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -530,13 +528,13 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 99F409EB2722FC670010500C /* AppConfig.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -544,13 +542,13 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 99F409EB2722FC670010500C /* AppConfig.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -558,6 +556,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 99F409EC2722FD0C0010500C /* HelperToolConfig.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 			};
@@ -567,6 +566,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 99F409EC2722FD0C0010500C /* HelperToolConfig.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 			};
@@ -605,20 +605,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		99662093272557FF00ECE5C7 /* XCRemoteSwiftPackageReference "EmbeddedPropertyList" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/trilemma-dev/EmbeddedPropertyList";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		99A67B312723B2D200F7D92D /* XCRemoteSwiftPackageReference "SecureXPC" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/trilemma-dev/SecureXPC";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 0.2.0;
-			};
-		};
-		99A67B342723B2E700F7D92D /* XCRemoteSwiftPackageReference "EmbeddedPropertyList" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/trilemma-dev/EmbeddedPropertyList";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
 			};
 		};
 		99A67B372723B2FC00F7D92D /* XCRemoteSwiftPackageReference "Blessed" */ = {
@@ -632,15 +632,20 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		99662094272557FF00ECE5C7 /* EmbeddedPropertyList */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 99662093272557FF00ECE5C7 /* XCRemoteSwiftPackageReference "EmbeddedPropertyList" */;
+			productName = EmbeddedPropertyList;
+		};
+		996620962725580A00ECE5C7 /* EmbeddedPropertyList */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 99662093272557FF00ECE5C7 /* XCRemoteSwiftPackageReference "EmbeddedPropertyList" */;
+			productName = EmbeddedPropertyList;
+		};
 		99A67B322723B2D200F7D92D /* SecureXPC */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 99A67B312723B2D200F7D92D /* XCRemoteSwiftPackageReference "SecureXPC" */;
 			productName = SecureXPC;
-		};
-		99A67B352723B2E700F7D92D /* EmbeddedPropertyList */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 99A67B342723B2E700F7D92D /* XCRemoteSwiftPackageReference "EmbeddedPropertyList" */;
-			productName = EmbeddedPropertyList;
 		};
 		99A67B382723B2FC00F7D92D /* Blessed */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -656,11 +661,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 99A67B312723B2D200F7D92D /* XCRemoteSwiftPackageReference "SecureXPC" */;
 			productName = SecureXPC;
-		};
-		99A67B3F2723B31000F7D92D /* EmbeddedPropertyList */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 99A67B342723B2E700F7D92D /* XCRemoteSwiftPackageReference "EmbeddedPropertyList" */;
-			productName = EmbeddedPropertyList;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

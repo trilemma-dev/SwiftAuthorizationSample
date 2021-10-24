@@ -29,12 +29,9 @@ if CommandLine.arguments.count > 1 {
     NSLog("parent is launchd, starting up XPC server")
     
     let server = try XPCMachServer.forBlessedExecutable()
-    server.registerRoute(SharedConstants.allowedCommandRoute,
-                         handler: AllowedCommandRunner.run(message:))
-    server.registerRoute(SharedConstants.uninstallRoute,
-                         handler: Uninstaller.uninstallFromXPC)
-    server.registerRoute(SharedConstants.updateRoute,
-                         handler: Updater.updateHelperTool(atPath:))
+    server.registerRoute(SharedConstants.allowedCommandRoute, handler: AllowedCommandRunner.run(message:))
+    server.registerRoute(SharedConstants.uninstallRoute, handler: Uninstaller.uninstallFromXPC)
+    server.registerRoute(SharedConstants.updateRoute, handler: Updater.updateHelperTool(atPath:))
     server.errorHandler = { error in
         if case .connectionInvalid = error {
             // Ignore invalidated connections as this happens whenever the client disconnects which is not a problem
