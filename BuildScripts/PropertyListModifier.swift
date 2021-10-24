@@ -203,14 +203,18 @@ func updatePropertyListWithEntries(_ newEntries: [String : AnyHashable], atPath 
     try writePropertyList(atPath: path, entries: entries, format: format)
 }
 
-/// Updates the property list by removing the provided keys (if present).
+/// Updates the property list by removing the provided keys (if present) or deletes the file if there are now no entries.
 func removePropertyListEntries(forKeys keys: [String], atPath path: URL) throws {
     let (entries, format) = try readPropertyList(atPath: path)
     for key in keys {
         entries.removeObject(forKey: key)
     }
     
-    try writePropertyList(atPath: path, entries: entries, format: format)
+    if entries.count > 0 {
+        try writePropertyList(atPath: path, entries: entries, format: format)
+    } else {
+        try FileManager.default.removeItem(at: path)
+    }
 }
 
 /// The path of the info property list for this target.

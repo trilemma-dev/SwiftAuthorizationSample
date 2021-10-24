@@ -141,16 +141,18 @@ If you configured the build variables to match the sample, then what you specifi
 `HELPER_TOOL_BUNDLE_IDENTIFIER` will be used as the filename for the helper tool.
 
 #### 5 & 7. Embedded launchd and Info Property Lists
-In the root of the helper tool directory create Info and launchd property list files with no entries. Just creating
-these files will *not* result in them being embedded in the helper tool, to do that we need to tell the compiler to
-inline the content of these files into the executable. If you configured the build variables to match the sample your
-helper tool should have the following build variable configured:
+In the root of the helper tool directory create a Info property list file with a
+[`CFBundleVersion`](https://developer.apple.com/documentation/bundleresources/information_property_list/cfbundleversion)
+entry. Unless you want to specify additional entries, you do not need to create a launchd property list as the build
+script will do that for you automatically.
+
+The compiler must be told to embedded these into the helper tool executable. If you configured the build variables to
+match the sample your helper tool should have the following build variable configured:
 ```
 OTHER_LDFLAGS = -sectcreate __TEXT __info_plist $(INFOPLIST_FILE) -sectcreate __TEXT __launchd_plist $(LAUNCHDPLIST_FILE)
 ```
 
-Where `INFOPLIST_FILE` and `LAUNCHDPLIST_FILE` are build variables with values of the paths to the two property list
-files you created.
+Where `INFOPLIST_FILE` are `LAUNCHDPLIST_FILE` are build variables with values of the paths to the property lists.
 
 Note: At runtime you can read the info property list as you would from an app bundle, but you cannot do so for the
       launchd property list. Neither of these property lists can be read externally as you would for an app bundle.
@@ -176,13 +178,14 @@ In your `xcodeproj` file:
 4. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift satisfy-job-bless-requirements`
 
 This will add the `SMPrivilegedExecutables` entry to your app's Info.plist each time the app is built either for debug
-or release. If you do want this auto-generated value to be persisted after the build process, take these optional steps:
+or release. If you do not want this auto-generated value to persist after the build process, take these optional steps:
 
 5. Add a Run Script Phase as the last phase
 6. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift cleanup-job-bless-requirements`
 
-This will delete the `SMPrivilegedExecutables` entry from your app's Info.plist at the end of the build process. The
-sample is configured to do perform this clean up step.
+This will delete the `SMPrivilegedExecutables` entry from your app's Info.plist at the end of the build process. If
+this results in an empty Info.plist then the property list will be deleted. The sample is configured to do perform this
+clean up step.
 
 Next we'll configure the build script to run for the helper tool:
 1. Select your helper tool target
@@ -193,7 +196,7 @@ Next we'll configure the build script to run for the helper tool:
    
 By specifying "satisfy-job-bless-requirements", the script will add the `SMAuthorizedClients` entry to the helper tool's
 info property list and the `Label` entry to the launchd property list each time the app is built either for debug or
-release. If you do not want these entries to be persisted as part of the Info.plist:
+release. If you do not want these entries to be persisted as part of the info or launchd property lists:
 
 5. Add a Run Script Phase as the last phase
 6. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift cleanup-job-bless-requirements`
