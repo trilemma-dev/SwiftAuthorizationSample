@@ -286,7 +286,6 @@ sudo rm -f /Library/PrivilegedHelperTools/com.example.SwiftAuthorizationApp.help
 The `launchctl unload` command may fail if the helper tool is still running. If so, you can terminate it with Activity
 Monitor.
 
-
 ## App Architecture & UI
 The sample app's architecture and UI are not meant to serve as examples of how to best build a macOS app. Please
 consult other resources for such guidance.

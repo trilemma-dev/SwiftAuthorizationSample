@@ -10,6 +10,7 @@ import Blessed
 
 /// Runs an allowed command.
 struct AllowedCommandRunner {
+    // Not intended to be constructed, this is used as a namespace
     private init() { }
     
     /// Errors that prevent an allowed command from being run.
@@ -17,7 +18,6 @@ struct AllowedCommandRunner {
         case authorizationMissing
         case authorizationFailed
     }
-    
     
     /// Runs the allowed command and replies with the results.
     ///

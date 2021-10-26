@@ -38,6 +38,8 @@ class HelperToolMonitor {
     /// Name of the privileged executable being monitored
     private let constants: SharedConstants
     
+    /// Creates the monitor.
+    /// - Parameter constants: Constants defining needed file paths.
     init(constants: SharedConstants) {
         self.constants = constants
         self.monitoredDirectories = [constants.blessedLocation.deletingLastPathComponent(),

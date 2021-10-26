@@ -13,7 +13,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     let sharedConstants: SharedConstants
     
+    /// Entry point into the app.
     override init() {
+        // Constants used throughout the app. If it can't be created, then one or more configuration issues exist.
         do {
             self.sharedConstants = try SharedConstants(caller: .app)
         } catch {
@@ -37,14 +39,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             print("Issue: \(error)")
             exit(-2)
         }
-    }
-    
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
-    }
-
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
     }
 
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
