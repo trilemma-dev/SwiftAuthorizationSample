@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/trilemma-dev/SecureXPC",
         "state": {
           "branch": null,
-          "revision": "422a3e3289d5c048a1bbfcc19e101dc1527728ea",
-          "version": "0.2.1"
+          "revision": "81f098d15af9b63b4677837cfb30e66f33605e2e",
+          "version": "0.2.2"
         }
       }
     ]
