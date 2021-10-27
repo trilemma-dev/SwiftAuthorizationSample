@@ -110,7 +110,7 @@ uses build variables and a custom build script to automate the process. In parti
 - Ensuring the helper tool's launchd `Label` value matches the helper tool's filename
 
 Additionally the build variables, build scripts, and sample code are designed to avoid any duplicative hard coding of
-values such. If you follow the pattern used in this sample and ever wanted to change these values, you'd only need to
+values. If you follow the pattern used in this sample and ever wanted to change these values, you'd only need to
 update them in one place each.
 
 This section walks your through satisfying all of Apple's requirements.
