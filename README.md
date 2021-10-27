@@ -4,11 +4,14 @@ This sample was created with the expectation that you already have an app and ar
 tool in order to perform one or more operations as root. As such this sample is **not** a template and is instead
 written in a modular way which should make it easy for you to add portions of this code to your project as desired.
 
-To try out this sample, configure your Developer ID signing certificate and you should be good to go. If you run into
-issues it may be because of Xcode compatability issues; this sample was created with Xcode 13.
+To try out this sample, configure your Development signing certificate for **both** the app and helper tool, then you
+should be good to go. Sign to Run Locally is not supported as this would result in no secure code requirements.
 
 Read the following sections to learn how you can incorporate portions of this sample into your own project. The source
 code of the sample also contains comments throughout.
+
+If you run into issues with this sample it may be because of Xcode compatability issues; this sample was created with
+Xcode 13.
 
 ## macOS Support
 This sample targets macOS 10.14.4 and above. If you would like to support pre-10.14.4 versions of macOS, the helper tool
@@ -19,8 +22,7 @@ and Xcode 10.2, Apple made the decision to end support for embedding the Swift r
 Note: The helper tool, once installed, will **not** be run from inside of your app bundle and so it cannot target any
 Swift runtime bundled with your app. (This is unlike XPC Services which may do this.)
 
-All three Swift packages used in this sample target macOS 10.10 and later. The code in the sample itself should
-similarly be able to run starting with macOS 10.10. 
+All three Swift frameworks used by this sample target macOS 10.10 and later.
 
 ## Dependencies
 Three Swift frameworks were created specifically for this helper tool use case:
@@ -31,15 +33,15 @@ Three Swift frameworks were created specifically for this helper tool use case:
   - Enables advanced use cases with a full implementation of Authorization Services and Service Management
 - [SecureXPC](https://github.com/trilemma-dev/SecureXPC): Communication between your app and helper tool
   - Easily send and receive [Codable](https://developer.apple.com/documentation/swift/codable) instances
-  - Designed specifically for secure XPC Mach Services communication, which by default has no restrictions
+  - Designed specifically for secure XPC Mach Services connections, which by default allow any process to communicate
 - [EmbeddedPropertyList](https://github.com/trilemma-dev/EmbeddedPropertyList): Embedded property list reader
   - Directly read the info and launchd property lists embedded in the helper tool
 
 Each of these frameworks have their own READMEs as well as full DocC documentation.
 
 ##  Installing a Helper Tool
-macOS allows apps to indirectly run code as root by installing a privileged helper tool. If you were to directly use
-Apple's APIs you'd use the
+macOS allows non-sandboxed apps to indirectly run code as root by installing a privileged helper tool. If you were to
+directly use Apple's APIs you'd use the
 [Authorization Services](https://developer.apple.com/documentation/security/authorization_services)
 framework to have the user authenticate as an admin and then call 
 [`SMJobBless`](https://developer.apple.com/documentation/servicemanagement/1431078-smjobbless) to perform
@@ -56,8 +58,8 @@ For this operation to succeed, Apple imposes numerous requirements:
 2. The helper tool **must** be signed.
 3. The helper tool **must** be located in the `Contents/Library/LaunchServices` directory inside your app's bundle.
 4. The filename of the helper tool **should** be reverse-DNS format.
-    - If your app has the bundle identifier "com.apple.Mail" then your helper tool **may** have a filename of
-      "com.apple.Mail.helper".
+    - If your app has the bundle identifier "com.example.SwiftAuthorizationApp" then your helper tool **may** have a
+      filename of "com.example.SwiftAuthorizationApp.helper".
 5. The helper tool **must** have an embedded launchd property list.
 6. The helper tool's embedded launchd property list **must** have an entry with `Label` as the key and the value
    **must** be the filename of the helper tool.
@@ -81,17 +83,17 @@ For this operation to succeed, Apple imposes numerous requirements:
 10. Your app's Info.plist **must** have an entry with 
       [`SMPrivilegedExecutables`](https://developer.apple.com/documentation/bundleresources/information_property_list/smprivilegedexecutables)
     as its key and its value must be a dictionary. Each dictionary key **must** be a helper tool's filename; for example
-    "com.apple.Mail.helper". Each dictionary value **must** be a string representation of a code signing requirement
-    that the helper tool satisfies.
+    "com.example.SwiftAuthorizationApp.helper". Each dictionary value **must** be a string representation of a code
+    signing requirement that the helper tool satisfies.
 
 ### Satisfying These Requirements
 While Apple imposes numerous requirements, many of them only need to be configured once. For the remainder, this sample
 uses build variables and a custom build script to automate the process. In particular the build script handles:
 
-- The `SMAuthorizedClients` entry differing depending on whether it's a debug or release build
-- The `SMPrivilegedExecutables` entry differing depending on whether it's a debug or release build
+- Generating the `SMPrivilegedExecutables` entry
+- Generating the `SMAuthorizedClients` entry, with a code requirement that prevents downgrade attacks
 - Incrementing the helper tool's `CFBundleVersion` so that it can be updated
-- Ensuring the `Label` value matches the helper tool's filename
+- Ensuring the helper tool's launchd `Label` value matches the helper tool's filename
 
 Additionally the build variables, build scripts, and sample code are designed to avoid any duplicative hard coding of
 values such. If you follow the pattern used in this sample and ever wanted to change these values, you'd only need to
@@ -110,17 +112,21 @@ build script.
 The exact steps for this may differ in future versions of Xcode. As of Xcode 13:
 
 1. Open your project's `xcodeproj` file
-2. Select your application's target
+2. Select your app's target
 3. Switch to the Build Phases tab
 4. Create a Copy Files Phase
 5. Set the Destination as "Wrapper"
 6. Set the Subpath to "Contents/Library/LaunchServices"
-7. Add the helper tool product, for example "com.apple.Mail.helper"
+7. Add the helper tool product, for example "com.example.SwiftAuthorizationApp.helper"
 8. Make sure "Code Sign on Copy" is checked
 
 #### Build Variables
 This sample relies on build variables to satisfy several of these requirements. You will need to set these build
-variables in three different places: for the whole project, for the app target, and for the helper tool target.
+variables for three different places:
+
+ - the project
+ - the app target
+ - the helper tool target
 
 The sample uses `xcconfig` files; however, you may do this using your `xcodeproj` file's Build Settings sections if you 
 prefer. If you would like to use `xcconfig` files, but are unfamiliar with them then read through this
@@ -132,9 +138,9 @@ For all of the entries needed, see the following `xcconfig` files:
  - SwiftAuthorizationApp/AppConfig.xcconfig
  - SwiftAuthorizationHelperTool/HelperToolConfig.xcconfig
  
-Note that the setting of identifiers in the project level Config.xcconfig is essential as both build processes needs
-access to this information. That is, at build time the app needs to know the identifier for the helper tool and vice
-versa.
+Note that the setting of some target specific values in the project level Config.xcconfig is essential as both build
+processes needs access to this information. For example, at build time the app needs to know the identifier for the
+helper tool in order to generate its `SMPrivilegedExecutables` entry.
 
 #### 4. Helper Tool Filename
 If you configured the build variables to match the sample, then what you specified as the value for the key
@@ -146,8 +152,8 @@ In the root of the helper tool directory create a Info property list file with a
 entry. Unless you want to specify additional entries, you do not need to create a launchd property list as the build
 script will do that for you automatically.
 
-The compiler must be told to embedded these into the helper tool executable. If you configured the build variables to
-match the sample your helper tool should have the following build variable configured:
+The compiler must be told to embedded these property lists into the helper tool executable. If you configured the build
+variables to match the sample your helper tool should have the following build variable configured:
 ```
 OTHER_LDFLAGS = -sectcreate __TEXT __info_plist $(INFOPLIST_FILE) -sectcreate __TEXT __launchd_plist $(LAUNCHDPLIST_FILE)
 ```
@@ -164,8 +170,8 @@ The build script once properly configured will automatically generate these entr
 on many of the build variables mentioned in the "Build Variables" section above. Make sure those are configured first.
 
 Create a folder for build scripts (or use an existing one) and copy PropertyListModifier.swift to it. In order to be
-run as a script the file must have its execute bit set. From a Terminal, running
-`chmod 755 PropertyListModifier.swift` on the script will make it world executable.
+run as a script the file must have its execute bit set. From Terminal, running `chmod 755 PropertyListModifier.swift` on
+the script will make it world executable.
 
 The following assumes you named that folder "BuildScripts". Now we need to configure your build process to run the
 script. The instructions below are applicable for Xcode 13 and may differ in future versions.
@@ -174,11 +180,11 @@ In your `xcodeproj` file:
 
 1. Select your app target
 2. Switch to the Build Phases tab
-3. Add a Run Script Phase which occurs right after Dependencies
+3. Add a Run Script Phase which occurs right after the Dependencies Phase
 4. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift satisfy-job-bless-requirements`
 
-This will add the `SMPrivilegedExecutables` entry to your app's Info.plist each time the app is built either for debug
-or release. If you do not want this auto-generated value to persist after the build process, take these optional steps:
+This will add the `SMPrivilegedExecutables` entry to your app's Info.plist each time the app is built. If you do not
+want this auto-generated value to persist after the build process, take these optional steps:
 
 5. Add a Run Script Phase as the last phase
 6. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift cleanup-job-bless-requirements`
@@ -195,8 +201,13 @@ Next we'll configure the build script to run for the helper tool:
    `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift satisfy-job-bless-requirements auto-increment-version`
    
 By specifying "satisfy-job-bless-requirements", the script will add the `SMAuthorizedClients` entry to the helper tool's
-info property list and the `Label` entry to the launchd property list each time the app is built either for debug or
-release. If you do not want these entries to be persisted as part of the info or launchd property lists:
+info property list and the `Label` entry to the launchd property list each time the app is built. The code requirement
+created for the client intentionally goes beyond what is required to satisfy `SMJobBless`; specifically it requires that
+the app be the same version or greater than the one which installed it. This prevents downgrade attacks where an older
+version of the app had some exploit, so an attacker could load an old version of the app in order to communicate with an
+already installed version of the helper tool.
+
+If you do not want these entries to be persisted as part of the info or launchd property lists:
 
 5. Add a Run Script Phase as the last phase
 6. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift cleanup-job-bless-requirements`
@@ -204,15 +215,16 @@ release. If you do not want these entries to be persisted as part of the info or
 By specifying "auto-increment-version", the script will increment the patch value of the `CFBundleVersion` entry if the 
 source code has changed. In order for the script to determine if the source code has changed it creates an entry in your
 helper tool's info property list with the `BuildHash` key and a value equal to the SHA256 hash of the helper tool's
-source code. In order for the version number to continue autoincrementing you'll need to commit these changes. If you do
-not want this autoincrement behavior, do not specify `auto-increment-version` as an argument for the build script. 
+source code. For the version number to continue autoincrementing you'll need to commit these changes. If you do not want
+this autoincrement behavior, do not specify `auto-increment-version` as an argument for the build script. Note that
+changes to framework dependencies will *not* cause an autoincrement.
 
 ## Communicating With a Helper Tool
 Communication between your app and the helper tool should be thought of as a client server relationship.  Your app
 functions as the client and the helper tool as the server. Similarly to communicating with a server over the Internet,
-your app does not start or stop the server. While in theory there are multiple ways for your client to communicate with
-the server, in practice an XPC Mach Service should be used. Note that while this uses XPC for communication, this does
-**not** make the helper tool an XPC Service.
+your app does not start or stop the server. While in theory there are multiple ways for your app to communicate with
+the helper tool, in practice an XPC Mach Service should be used. Note that while this uses XPC for communication, this
+does **not** make the helper tool an XPC Service.
 
 launchd will ensure your helper tool is running if it needs to handle a request. If it was not already running when you
 made a request, expect a small amount of initial latency.
@@ -224,7 +236,9 @@ Apple Developer Forums discussion on the topic.) Fortunately, since macOS 11 the
 functionality and there is an undocumented way to achieve the same result on older versions of macOS. The 
 [SecureXPC](https://github.com/trilemma-dev/SecureXPC) framework used by this sample is built on top of the C API and 
 requires all communication to be secured. It can be automatically configured to use the same code signing requirements
-as `SMAuthorizedClients` in the helper tool's info property list. 
+as `SMAuthorizedClients` in the helper tool's info property list which is what this sample does. Used in this manner,
+the code requirement generated by `PropertyListModifier.swift` build script for the client prevents older versions of
+the client from talking to the helper tool - providing a key part of downgrade attack prevention.
 
 Note: While XPC allows for sending certain types of live references such as file descriptors, the SecureXPC framework
 does not support this — it only sends serializable data.
@@ -232,11 +246,12 @@ does not support this — it only sends serializable data.
 ### Registering an XPC Mach Server
 For the helper tool to be an XPC Mach server, it must register to be one in its launchd property list. The build script
 can do this for you automatically be adding the "specify-mach-services" argument. If you want this to be cleaned up at
-the end of the build process, then for that Run Script Phase add the "cleanup-mach-services" argument.
+the end of the build process, then for that Run Script Phase add the "cleanup-mach-services" argument. This sample is
+configured to do both.
 
 The script will set the service name to be the same as its bundle identifier, which in practice will also be its
 filename and the value for `Label`. This is done purely for convenience; there is no requirement the service name use
-the  same identifier. Nowhere does the sample app or helper tool code assume they are the same.
+the same identifier. Nowhere does the sample app or helper tool code assume they are the same.
 
 ### Security in Depth — Limiting Privileged Operations
 While SecureXPC is designed to restrict which processes your server handle requests from, there's still the possibility
@@ -245,6 +260,22 @@ execution.) As such it is a best practice to limit what actions your helper tool
 required by your app. This way if an exploit exists it limits the damage. In the sample while the helper tool uses
 `Process` to run executables as root, it does not honor requests for any arbitrary executable - only those specified in
 the `AllowedCommand` enum are run.
+
+### Security in Depth - Preventing Downgrade Attacks
+If you discover your app has an exploit which attackers can use to communicate with your helper tool (and thererefor
+perform privileged operations) it is of course obvious you should fix the security vulnerability in a future update of
+your app. 
+
+What may be less obvious is it's also important that your app update contain a new version of privileged helper tool and
+that this helper tool be updated on end users' Macs. The helper tool does not need any code changes, it just needs to be
+a new version such that it will accepted as an update.
+
+If there's no code change, why is this needed? This is because while the code has not changed, the `SMAuthorizedClients`
+entry in its info property list will have. Every time the project is built, the `PropertyListModifier.swift` build
+script includes a requirement that the app have a minimum version of the current version being built. This requirement
+is also used by `SecureXPC` so this means older versions of the app can't communicate with newer versions of the helper
+tool. By updating helper tool, you'll be preventing attackers from subverting your security fix by running an older
+version of your app and then exploiting it as before in order to communicate with the helper tool.
 
 ## Determining a Helper Tool's Install Status
 Apple does not provide an API to determine the install status of a helper tool. However, this can still be achieved. See
@@ -259,10 +290,10 @@ helper." Despite not providing an API, it is *possible* for the helper tool to u
 SwiftAuthorizationHelperTool/Uninstaller.swift for an example of how to do so.
 
 ## Updating a Helper Tool
-`SMJobBless` and the equivalent convenience version offered by the Blessed framework can with user authorization
-manually update an installed helper tool. If your app would like to automatically update the helper tool without
-user involvement see SwiftAuthorizationHelperTool/Update.swift for an example of how to do so. Note that this updater
-has certain self-imposed restrictions and will not perform an update in all circumstances.
+`SMJobBless` and the equivalent versions offered by the Blessed framework can with user authorization manually update an
+installed helper tool. If your app would like to automatically update the helper tool without user involvement see
+SwiftAuthorizationHelperTool/Update.swift for an example of how to do so. Note that this updater has certain 
+self-imposed restrictions and will not perform an update in all circumstances. 
 
 ## Debugging a Helper Tool
 The helper tool is run by launchd, not Xcode, and therefore can be challenging to debug. A reliable way to debug it
@@ -287,8 +318,9 @@ The `launchctl unload` command may fail if the helper tool is still running. If 
 Monitor.
 
 ## App Architecture & UI
-The sample app's architecture and UI are not meant to serve as examples of how to best build a macOS app. Please
-consult other resources for such guidance.
+The sample app's architecture and UI are not meant to serve as examples of how to best build a macOS app. Notably UI 
+technology chosen was to support back to macOS 10.14.4 which does not support SwiftUI. Please consult other resources
+for such guidance. 
 
 ## Other Considerations
 While this sample shows one app installing and communicating with one helper tool, the relationship can be many to 
@@ -298,6 +330,6 @@ installed/updated by and communicate with multiple apps.
 ## Origin
 This sample is inspired by Apple's no longer updated
 [EvenBetterAuthorizationSample](https://developer.apple.com/library/archive/samplecode/EvenBetterAuthorizationSample/Introduction/Intro.html)
-written in Objective C. This sample is implemented exclusively in Swift. While Apple's sample has numerous known
+written in Objective-C. This sample is implemented exclusively in Swift. While Apple's sample has numerous known
 [security vulnerabilities](https://theevilbit.github.io/posts/secure_coding_xpc_part1/), this sample has been designed
 with security in mind. If you discover a security vulnerability, please open an issue!

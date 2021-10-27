@@ -89,15 +89,36 @@ let SMPrivilegedExecutablesKey = "SMPrivilegedExecutables"
 /// The leaf certificate is the one which corresponds to your developer certificate. The certificates above it in the chain are Apple's.
 /// Depending on whether this build is signed for debug or release the leaf certificate *will* differ, but the organizational unit, represented by `subject.OU` in
 /// the function, will remain the same.
-func organizationalUnitLeafCertificate() throws -> String {
+func organizationalUnitRequirement() throws -> String {
+    // In order for this requirement to actually work, the signed app or helper tool needs to have a certificate chain
+    // which will contain the organizational unit (subject.OU). While it'd be great if we could just examine the signed
+    // app/helper tool after that's been done, that's of course not possible as we need to generate this requirement
+    // *during* the process for each.
+    //
+    // Note: In practice this certificate chain won't exist when self signing using "Sign to Run Locally".
+    //
+    // There's no to precise way to determine if the subject.OU will be present, but in practice we can check for the
+    // subject.CN (CN stands for common name) by seeing if there is a meaningful value for the CODE_SIGN_IDENTITY
+    // build variable. This could still fail because we're checking for *this* target's common name, but creating an
+    // identity for the *other* target - so if Xcode isn't configured the same for both targets an issue is likely to
+    // arise.
+    //
+    // Note: The reason to use the organizational unit for the code requirement instead of the common name is because
+    // the organizational unit will be consistent between the Apple Development and Developer ID builds, while the
+    // common name will not be — simplifying the development workflow.
+    let commonName = ProcessInfo.processInfo.environment["CODE_SIGN_IDENTITY"]
+    if commonName == nil || commonName == "-" {
+        throw ScriptError.general("Signing Certificate must be Development. Sign to Run Locally is not supported.")
+    }
+    
     let developmentTeamId = try readEnvironmentVariable(name: "DEVELOPMENT_TEAM",
-                                                        description: "development team",
+                                                        description: "development team for code signing",
                                                         isUserDefined: false)
     guard developmentTeamId.range(of: #"^[A-Z0-9]{10}$"#, options: .regularExpression) != nil else {
         if developmentTeamId == "-" {
-            throw ScriptError.general("Signing Team is not set")
+            throw ScriptError.general("Development Team for code signing is not set")
         } else {
-            throw ScriptError.general("Signing Team Id is invalid: \(developmentTeamId)")
+            throw ScriptError.general("Development Team for code signing is invalid: \(developmentTeamId)")
         }
     }
     let certificateString = "certificate leaf[subject.OU] = \(developmentTeamId)"
@@ -107,8 +128,16 @@ func organizationalUnitLeafCertificate() throws -> String {
 
 /// Creates a `SMAuthorizedClients` entry representing the app which must go inside the helper tool's info property list.
 func SMAuthorizedClientsEntry() throws -> (key: String, value: [String]) {
-    let appIdentifier = "identifier \"\(try TargetType.app.bundleIdentifier())\""
-    let requirements = [appIdentifier, try organizationalUnitLeafCertificate()]
+    let appIdentifierRequirement = "identifier \"\(try TargetType.app.bundleIdentifier())\""
+    // Create requirement that the app must be its current version or later. This mitigates downgrade attacks where an
+    // older version of the app had a security vulnerability fixed in later versions. The attacker could then
+    // intentionally install and run an older version of the app and exploit its vulnerability in order to talk to
+    // the helper tool.
+    let appVersion = try readEnvironmentVariable(name: "APP_VERSION",
+                                                 description: "app version",
+                                                 isUserDefined: true)
+    let appVersionRequirement = "info[\(CFBundleVersionKey)] >= \"\(appVersion)\""
+    let requirements = [appIdentifierRequirement, appVersionRequirement, try organizationalUnitRequirement()]
     let value = [requirements.joined(separator: " and ")]
     
     return (SMAuthorizedClientsKey, value)
@@ -116,8 +145,8 @@ func SMAuthorizedClientsEntry() throws -> (key: String, value: [String]) {
 
 /// Creates a `SMPrivilegedExecutables` entry representing the helper tool which must go inside the app's info property list.
 func SMPrivilegedExecutablesEntry() throws -> (key: String, value: [String : String]) {
-    let helperToolIdentifier = "identifier \"\(try TargetType.helperTool.bundleIdentifier())\""
-    let requirements = [helperToolIdentifier, try organizationalUnitLeafCertificate()]
+    let helperToolIdentifierRequirement = "identifier \"\(try TargetType.helperTool.bundleIdentifier())\""
+    let requirements = [helperToolIdentifierRequirement, try organizationalUnitRequirement()]
     let value = [try TargetType.helperTool.bundleIdentifier() : requirements.joined(separator: " and ")]
     
     return (SMPrivilegedExecutablesKey, value)

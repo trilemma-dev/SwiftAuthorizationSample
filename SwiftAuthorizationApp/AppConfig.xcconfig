@@ -22,6 +22,7 @@ ENABLE_APP_SANDBOX = NO
 // Info property list
 INFOPLIST_FILE = $(APP_TARGET_DIRECTORY)/Info.plist
 GENERATE_INFOPLIST_FILE = YES
+CURRENT_PROJECT_VERSION = $(APP_VERSION) // Xcode's info plist generation makes this the value for CFBundleVersion
 INFOPLIST_KEY_LSApplicationCategoryType = public.app-category.developer-tools
 INFOPLIST_KEY_CFBundleName = $(APP_TARGET_NAME)
 INFOPLIST_KEY_CFBundleExecutable = $(APP_TARGET_NAME)
