@@ -63,7 +63,7 @@ the installation. The [Blessed](https://github.com/trilemma-dev/Blessed) framewo
 to just one function call.
 
 If this operation succeeds the helper tool will be copied from the `Contents/Library/LaunchServices` directory inside
-your app bundle to `/Library/PrivilegedHelperTools/`. Once installed, it managed by
+your app bundle to `/Library/PrivilegedHelperTools/`. Once installed, it is managed by
 [launchd](https://support.apple.com/guide/terminal/script-management-with-launchd-apdc6c1077b-5d5d-4d35-9c19-60f2397b2369/mac).
 
 For this operation to succeed, Apple imposes numerous requirements:
