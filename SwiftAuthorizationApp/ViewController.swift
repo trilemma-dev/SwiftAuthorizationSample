@@ -258,7 +258,7 @@ class ViewController: NSViewController {
             switch result {
                 case let .success(reply):
                     if let standardOutput = reply.standardOutput {
-                        self.outputText.textColor = NSColor.white
+                        self.outputText.textColor = NSColor.textColor
                         self.outputText.string = standardOutput
                     } else if let standardError = reply.standardError {
                         self.outputText.textColor = NSColor.systemRed
