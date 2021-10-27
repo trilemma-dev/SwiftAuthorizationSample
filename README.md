@@ -5,13 +5,27 @@ tool in order to perform one or more operations as root. As such this sample is 
 written in a modular way which should make it easy for you to add portions of this code to your project as desired.
 
 To try out this sample, configure your Development signing certificate for **both** the app and helper tool, then you
-should be good to go. Sign to Run Locally is not supported as this would result in no secure code requirements.
+should be good to go. Sign to Run Locally is not supported as this would result in code requirements which cannot
+securely identify the app and helper tool.
 
 Read the following sections to learn how you can incorporate portions of this sample into your own project. The source
 code of the sample also contains comments throughout.
 
 If you run into issues with this sample it may be because of Xcode compatability issues; this sample was created with
 Xcode 13.
+
+## Sample Overview
+When you run the sample you should see an app which looks like this (shown in dark mode):
+![Screenshot](screenshot.png)
+
+Initially the helper tool won't be installed, so start by trying out that functionality.
+
+Once the helper tool is installed you can run any of the privileged commands. These are a pretty arbitrary set of
+macOS Command Line Tools and some of the arguments you can pass to them. The only commonality between them is
+they require root access to run (and are non-destructive, since it is a sample after all).
+
+Two of the commands say "[Auth Required]" and when run will require you to provide an admin password. This is done to
+demonstrate how, if you so desire, you can self-restrict access to portions of your helper tool.
 
 ## macOS Support
 This sample targets macOS 10.14.4 and above. If you would like to support pre-10.14.4 versions of macOS, the helper tool
