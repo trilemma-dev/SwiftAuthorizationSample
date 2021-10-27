@@ -204,7 +204,7 @@ want this auto-generated value to persist after the build process, take these op
 6. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift cleanup-job-bless-requirements`
 
 This will delete the `SMPrivilegedExecutables` entry from your app's Info.plist at the end of the build process. If
-this results in an empty Info.plist then the property list will be deleted. The sample is configured to do perform this
+this results in an empty Info.plist then the property list will be deleted. The sample is configured to perform this
 clean up step.
 
 Next we'll configure the build script to run for the helper tool:
