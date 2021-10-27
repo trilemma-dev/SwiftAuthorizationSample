@@ -105,7 +105,7 @@ While Apple imposes numerous requirements, many of them only need to be configur
 uses build variables and a custom build script to automate the process. In particular the build script handles:
 
 - Generating the `SMPrivilegedExecutables` entry
-- Generating the `SMAuthorizedClients` entry, with a code requirement that prevents downgrade attacks
+- Generating the `SMAuthorizedClients` entry, with a code requirement that mitigates downgrade attacks
 - Incrementing the helper tool's `CFBundleVersion` so that it can be updated
 - Ensuring the helper tool's launchd `Label` value matches the helper tool's filename
 
