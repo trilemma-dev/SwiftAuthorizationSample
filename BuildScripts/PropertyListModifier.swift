@@ -126,6 +126,9 @@ func organizationalUnitRequirement() throws -> String {
     return certificateString
 }
 
+/// Requirement that Apple is part of the certificate chain, mean it was signed by an Apple issued certificate
+let appleGenericRequirement = "anchor apple generic"
+
 /// Creates a `SMAuthorizedClients` entry representing the app which must go inside the helper tool's info property list.
 func SMAuthorizedClientsEntry() throws -> (key: String, value: [String]) {
     let appIdentifierRequirement = "identifier \"\(try TargetType.app.bundleIdentifier())\""
@@ -137,7 +140,10 @@ func SMAuthorizedClientsEntry() throws -> (key: String, value: [String]) {
                                                  description: "app version",
                                                  isUserDefined: true)
     let appVersionRequirement = "info[\(CFBundleVersionKey)] >= \"\(appVersion)\""
-    let requirements = [appIdentifierRequirement, appVersionRequirement, try organizationalUnitRequirement()]
+    let requirements = [appleGenericRequirement,
+                        appIdentifierRequirement,
+                        appVersionRequirement,
+                        try organizationalUnitRequirement()]
     let value = [requirements.joined(separator: " and ")]
     
     return (SMAuthorizedClientsKey, value)
@@ -146,7 +152,7 @@ func SMAuthorizedClientsEntry() throws -> (key: String, value: [String]) {
 /// Creates a `SMPrivilegedExecutables` entry representing the helper tool which must go inside the app's info property list.
 func SMPrivilegedExecutablesEntry() throws -> (key: String, value: [String : String]) {
     let helperToolIdentifierRequirement = "identifier \"\(try TargetType.helperTool.bundleIdentifier())\""
-    let requirements = [helperToolIdentifierRequirement, try organizationalUnitRequirement()]
+    let requirements = [appleGenericRequirement, helperToolIdentifierRequirement, try organizationalUnitRequirement()]
     let value = [try TargetType.helperTool.bundleIdentifier() : requirements.joined(separator: " and ")]
     
     return (SMPrivilegedExecutablesKey, value)
