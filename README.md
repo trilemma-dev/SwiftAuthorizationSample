@@ -166,7 +166,7 @@ In the root of the helper tool directory create a Info property list file with a
 entry. Unless you want to specify additional entries, you do not need to create a launchd property list as the build
 script will do that for you automatically.
 
-The compiler must be told to embedded these property lists into the helper tool executable. If you configured the build
+The compiler must be told to embed these property lists into the helper tool executable. If you configured the build
 variables to match the sample your helper tool should have the following build variable configured:
 ```
 OTHER_LDFLAGS = -sectcreate __TEXT __info_plist $(INFOPLIST_FILE) -sectcreate __TEXT __launchd_plist $(LAUNCHDPLIST_FILE)
