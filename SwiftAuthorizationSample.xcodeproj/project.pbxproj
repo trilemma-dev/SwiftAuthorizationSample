@@ -66,7 +66,7 @@
 		99A67B5727243FD800F7D92D /* CodeInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeInfo.swift; sourceTree = "<group>"; };
 		99A67B592724413300F7D92D /* AllowedCommandRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllowedCommandRunner.swift; sourceTree = "<group>"; };
 		99A67B5B2724416C00F7D92D /* Updater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Updater.swift; sourceTree = "<group>"; };
-		99F409CB27216B210010500C /* SwiftAuthorizationApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftAuthorizationApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		99F409CB27216B210010500C /* Swift Authorization Sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Swift Authorization Sample.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		99F409CE27216B210010500C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		99F409D027216B210010500C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		99F409D227216B230010500C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -79,6 +79,7 @@
 		99F409EC2722FD0C0010500C /* HelperToolConfig.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = HelperToolConfig.xcconfig; sourceTree = "<group>"; };
 		99F409EE272300EB0010500C /* PropertyListModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertyListModifier.swift; sourceTree = "<group>"; };
 		99F409F6272304B20010500C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		99F6E8552729484500ED2001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,7 +130,7 @@
 		99F409CC27216B210010500C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				99F409CB27216B210010500C /* SwiftAuthorizationApp.app */,
+				99F409CB27216B210010500C /* Swift Authorization Sample.app */,
 				99F409E127216BFF0010500C /* com.example.SwiftAuthorizationApp.helper */,
 			);
 			name = Products;
@@ -144,6 +145,7 @@
 				99F409D027216B210010500C /* ViewController.swift */,
 				99F409D427216B230010500C /* Main.storyboard */,
 				99F409D227216B230010500C /* Assets.xcassets */,
+				99F6E8552729484500ED2001 /* Info.plist */,
 			);
 			path = SwiftAuthorizationApp;
 			sourceTree = "<group>";
@@ -206,7 +208,7 @@
 				99662094272557FF00ECE5C7 /* EmbeddedPropertyList */,
 			);
 			productName = SwiftAuthorizationSample;
-			productReference = 99F409CB27216B210010500C /* SwiftAuthorizationApp.app */;
+			productReference = 99F409CB27216B210010500C /* Swift Authorization Sample.app */;
 			productType = "com.apple.product-type.application";
 		};
 		99F409E027216BFF0010500C /* SwiftAuthorizationHelperTool */ = {
@@ -527,6 +529,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
+				INFOPLIST_KEY_CFBundleDisplayName = "$(DISPLAY_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
@@ -544,6 +547,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
+				INFOPLIST_KEY_CFBundleDisplayName = "$(DISPLAY_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;

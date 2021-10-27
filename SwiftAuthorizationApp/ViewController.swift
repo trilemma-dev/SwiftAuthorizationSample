@@ -62,6 +62,34 @@ class ViewController: NSViewController {
         }
     }
     
+    override func viewWillAppear() {
+        // Have the window title and menu items reflect the display name of the app
+        if let displayName = Bundle.main.infoDictionary?["CFBundleName"] as? String {
+            if let window = self.view.window {
+                window.title = displayName
+            }
+            
+            let menu = NSMenu()
+            let menuItemOne = NSMenuItem()
+            menuItemOne.submenu = NSMenu()
+            let aboutItem = NSMenuItem(title: "About \(displayName)",
+                                       action: #selector(ViewController.openGithubPage(_:)),
+                                       keyEquivalent: "")
+            let quitItem = NSMenuItem(title: "Quit \(displayName)",
+                                      action: #selector(NSApplication.terminate(_:)),
+                                      keyEquivalent: "q")
+            menuItemOne.submenu?.items = [aboutItem, NSMenuItem.separator(), quitItem]
+            menu.items = [menuItemOne]
+            NSApplication.shared.mainMenu = menu
+        }
+    }
+    
+    @objc func openGithubPage(_ sender: Any?) {
+        if let url = URL(string: "https://github.com/trilemma-dev/SwiftAuthorizationSample") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+    
     /// Updates the Installation section of the UI.
     ///
     /// This gets called by the HelperToolMonitor when changes occur.

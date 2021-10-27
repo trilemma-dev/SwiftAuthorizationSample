@@ -8,35 +8,24 @@
 // Configuration settings file format documentation can be found at:
 // https://help.apple.com/xcode/#/dev745c5c974
 
-// *IMPORTANT*
-// For your own project, use non-example values. These values are referenced from numerous other places in such a way
-// that you should only need to update the values here in order for everything to work. These values are not hardcoded
-// anywhere within the Swift source files or build script.
+// App and helper tool bundle identifiers need to be defined at the project level so during the build processes for each
+// they can reference each other's bundle identifiers. These are encoded into the code requirements for each other.
 APP_BUNDLE_IDENTIFIER = com.example.SwiftAuthorizationApp
-APP_TARGET_DIRECTORY = SwiftAuthorizationApp
-APP_TARGET_NAME = SwiftAuthorizationApp
-APP_VERSION = 1.0.0 // Defined at the top-level so the helper tool can mitigate downgrade attacks
-
 HELPER_TOOL_BUNDLE_IDENTIFIER = $(APP_BUNDLE_IDENTIFIER).helper
-HELPER_TOOL_TARGET_DIRECTORY = SwiftAuthorizationHelperTool
 
-// Setting a minimum deployment targer less than 10.14.4 means the Swift 5 Runtime Support for Command Line Tools
+// The app's version needs to be defined at the project level so the helper tool can encode this as a code requirement
+// mitigate downgrade attacks. See README for details.
+APP_VERSION = 1.0.0
+
+// Setting a minimum deployment target less than 10.14.4 means the Swift 5 Runtime Support for Command Line Tools
 // must be installed in order for the helper tool to run. (Alternatively the helper tool could be implemented in another
 // language such as Objective C, C, or C++.)
 MACOSX_DEPLOYMENT_TARGET = 10.14.4
 
-
-// There should not be a need to modify anything below this line in this configuration file unless you modify the
-// folder structure of this project
-
-
-// Directory containing app-specific code shared by both the app and helper tool
+// Directory containing app-specific code shared by both the app and helper tool. Change this if you modify the
+// directory structure of this sample. This is referenced by the build script.
 SHARED_DIRECTORY = Shared
 
-
-// There should never be a need to modify anything below this line in this configuration file
-
-
 // Required for notarization. Protects from classes of exploits, like code injection, dynamically linked library (DLL)
-// hijacking, and process memory space tampering
+// hijacking, and process memory space tampering.
 ENABLE_HARDENED_RUNTIME = YES

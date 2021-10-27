@@ -10,25 +10,31 @@
 
 #include "Config.xcconfig"
 
-// There should not be a need to modify anything in this configuration file
+// The display name for the sample app (for a non-sample app you would not necessarily want to define this here).
+DISPLAY_NAME = Authorization Sample
 
+// The name of the .app bundle created by the build process. Often matches the display name, but does not need to.
+TARGET_NAME = Swift Authorization Sample
+
+// The directory containing the source code and property lists for the helper tool.
+TARGET_DIRECTORY = SwiftAuthorizationApp
+
+
+// ** There should not be a need to modify anything below this line in this configuration file ** //
+
+
+// Bundle identifier used both in the info property list and so the build script knows which target it is running for.
+// If you want to change the bundle identifier, change the value for APP_BUNDLE_IDENTIFIER in Config.xcconfig.
 PRODUCT_BUNDLE_IDENTIFIER = $(APP_BUNDLE_IDENTIFIER)
-TARGET_NAME = $(APP_TARGET_NAME)
-PRODUCT_NAME = $(APP_TARGET_NAME)
 
-// It is not possible to use the Authorization framework from a sandboxed app
+// The product name match the name of the .app.
+PRODUCT_NAME = $(TARGET_NAME)
+
+// It is not possible to use the Authorization framework from a sandboxed app.
 ENABLE_APP_SANDBOX = NO
 
-// Info property list
-INFOPLIST_FILE = $(APP_TARGET_DIRECTORY)/Info.plist
-GENERATE_INFOPLIST_FILE = YES
-CURRENT_PROJECT_VERSION = $(APP_VERSION) // Xcode's info plist generation makes this the value for CFBundleVersion
-INFOPLIST_KEY_LSApplicationCategoryType = public.app-category.developer-tools
-INFOPLIST_KEY_CFBundleName = $(APP_TARGET_NAME)
-INFOPLIST_KEY_CFBundleExecutable = $(APP_TARGET_NAME)
-// These entries are specific to this sample using a Storyboard
-INFOPLIST_KEY_NSMainStoryboardFile = Main
-INFOPLIST_KEY_NSPrincipalClass = NSApplication
+// Location of the info property list.
+INFOPLIST_FILE = $(TARGET_DIRECTORY)/Info.plist
 
-// Tells Xcode Archive the app is the target which should be the installable artifact (unlike the helper tool)
+// Tells Xcode Archive the app is the target which should be the installable artifact (unlike the helper tool).
 SKIP_INSTALL = NO
