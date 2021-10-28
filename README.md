@@ -51,6 +51,9 @@ Three Swift frameworks were created specifically for this helper tool use case:
 - [EmbeddedPropertyList](https://github.com/trilemma-dev/EmbeddedPropertyList): Embedded property list reader
   - Directly read the info and launchd property lists embedded in the helper tool
 
+These are collectively [available as a package collection](https://swiftpackageindex.com/trilemma-dev/collection.json)
+which you can [add to Xcode 13 or later](https://swiftpackageindex.com/package-collections).
+
 Each of these frameworks have their own READMEs as well as full DocC documentation.
 
 ##  Installing a Helper Tool
