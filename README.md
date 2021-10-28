@@ -286,7 +286,7 @@ If there's no code change, why is this needed? This is because while the code ha
 entry in its info property list will have. Every time the project is built, the `PropertyListModifier.swift` build
 script includes a requirement that the app have a minimum version of the current version being built. This requirement
 is also used by `SecureXPC` so this means older versions of the app can't communicate with newer versions of the helper
-tool. By updating helper tool, you'll be preventing attackers from subverting your security fix by running an older
+tool. By updating the helper tool, you'll be preventing attackers from subverting your security fix by running an older
 version of your app and then exploiting it as before in order to communicate with the helper tool.
 
 ## Determining a Helper Tool's Install Status
