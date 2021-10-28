@@ -11,7 +11,7 @@ securely identify the app and helper tool.
 Read the following sections to learn how you can incorporate portions of this sample into your own project. The source
 code of the sample also contains comments throughout.
 
-If you run into issues with this sample it may be because of Xcode compatability issues; this sample was created with
+If you run into issues with this sample it may be because of Xcode compatibility issues; this sample was created with
 Xcode 13.
 
 ## Sample Overview
