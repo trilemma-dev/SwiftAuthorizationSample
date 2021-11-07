@@ -86,6 +86,8 @@ let SMPrivilegedExecutablesKey = "SMPrivilegedExecutables"
 
 /// A requirement that the organizational unit for the leaf certificate match the development team identifier.
 ///
+/// From Apple's documentation: "In Apple issued developer certificates, this field contains the developer’s Team Identifier."
+///
 /// The leaf certificate is the one which corresponds to your developer certificate. The certificates above it in the chain are Apple's.
 /// Depending on whether this build is signed for debug or release the leaf certificate *will* differ, but the organizational unit, represented by `subject.OU` in
 /// the function, will remain the same.
