@@ -16,7 +16,7 @@ DISPLAY_NAME = Authorization Sample
 // The name of the .app bundle created by the build process. Often matches the display name, but does not need to.
 TARGET_NAME = Swift Authorization Sample
 
-// The directory containing the source code and property lists for the helper tool.
+// The directory containing the source code and property lists for the main App.
 TARGET_DIRECTORY = SwiftAuthorizationApp
 
 
