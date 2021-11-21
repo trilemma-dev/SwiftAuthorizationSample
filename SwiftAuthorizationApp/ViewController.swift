@@ -64,7 +64,7 @@ class ViewController: NSViewController {
     
     override func viewWillAppear() {
         // Have the window title and menu items reflect the display name of the app
-        if let displayName = Bundle.main.infoDictionary?["CFBundleName"] as? String {
+        if let displayName = Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String {
             if let window = self.view.window {
                 window.title = displayName
             }
@@ -75,10 +75,17 @@ class ViewController: NSViewController {
             let aboutItem = NSMenuItem(title: "About \(displayName)",
                                        action: #selector(ViewController.openGithubPage(_:)),
                                        keyEquivalent: "")
+            let printDiagnosticInfoItem = NSMenuItem(title: "Print Diagnostic Info",
+                                                     action: #selector(ViewController.printDiagnosticInfo(_:)),
+                                                     keyEquivalent: "")
             let quitItem = NSMenuItem(title: "Quit \(displayName)",
                                       action: #selector(NSApplication.terminate(_:)),
                                       keyEquivalent: "q")
-            menuItemOne.submenu?.items = [aboutItem, NSMenuItem.separator(), quitItem]
+            menuItemOne.submenu?.items = [aboutItem,
+                                          NSMenuItem.separator(),
+                                          printDiagnosticInfoItem,
+                                          NSMenuItem.separator(),
+                                          quitItem]
             menu.items = [menuItemOne]
             NSApplication.shared.mainMenu = menu
         }
@@ -88,6 +95,10 @@ class ViewController: NSViewController {
         if let url = URL(string: "https://github.com/trilemma-dev/SwiftAuthorizationSample") {
             NSWorkspace.shared.open(url)
         }
+    }
+    
+    @objc func printDiagnosticInfo(_ sender: Any?) {
+        DiagnosticSigningInfo.printDiagnosticInfo()
     }
     
     /// Updates the Installation section of the UI.

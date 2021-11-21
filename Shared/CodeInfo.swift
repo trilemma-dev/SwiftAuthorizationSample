@@ -12,12 +12,14 @@ enum CodeInfo {
     
     /// Errors that may occur when trying to determine information about this running helper tool or another on disk executable.
     enum CodeInfoError: Error {
-        /// Unable to determine the location this code is running from.
+        /// Unable to determine the location of the executable.
         case codeLocationNotRetrievable(OSStatus)
         /// Unable to retrieve the on disk code representation for a specified file URL.
         case externalStaticCodeNotRetrievable(OSStatus)
         /// Unable to retrieve the on disk code representation for this code.
         case helperToolStaticCodeNotRetrievable(OSStatus)
+        /// Unable to retrieve the leaf certificate for a code instance.
+        case leafCertificateNotRetrievable
         /// Unable to retrieve the signing key information for the provided on disk code representation.
         case signingKeyDataNotRetrievable
     }
@@ -67,7 +69,7 @@ enum CodeInfo {
     ///   - forExecutable: On disk location of an executable.
     /// - Throws: If unable to create the static code.
     /// - Returns: Static code instance corresponding to the provided `URL`.
-    private static func createStaticCode(forExecutable url: URL) throws -> SecStaticCode {
+    static func createStaticCode(forExecutable url: URL) throws -> SecStaticCode {
         var staticCode: SecStaticCode?
         let status = SecStaticCodeCreateWithPath(url as CFURL, SecCSFlags(), &staticCode)
         if status == errSecSuccess, let staticCode = staticCode {
@@ -81,7 +83,7 @@ enum CodeInfo {
     ///
     /// - Throws: If unable to create a copy of the on disk representation of this code.
     /// - Returns: Static code instance corresponding to the executable running this code.
-    private static func copyCurrentStaticCode() throws -> SecStaticCode {
+    static func copyCurrentStaticCode() throws -> SecStaticCode {
         var currentCode: SecCode?
         let status = SecCodeCopySelf(SecCSFlags(), &currentCode)
         if status == errSecSuccess, let currentCode = currentCode {
@@ -97,25 +99,35 @@ enum CodeInfo {
         }
     }
     
-    /// Returns the signing key in data form for the leaf certificate in the certificate chain.
+    /// Returns the leaf certificate in the code's certificate chain.
     ///
-    /// - Parameters:
-    ///  - staticCode: On disk representation of an executable.
-    /// - Throws: If unable to copy the data.
-    /// - Returns: Signing key in data form for the leaf certificate in the certificate chain.
-    private static func copyLeafCertificateKeyData(staticCode: SecStaticCode) throws -> Data {
-        // This giant if statement with a bunch of let statements does the following:
-        //  - Gets the signing information for the static code which includes the signing certificates
-        //  - Finds the leaf certificate which corresponds to a third party Developer ID certificate
-        //  - Retrieves the public key from the leaf certificate
-        //  - Transforms that public key into a Data instance which can be easily compared
+    /// For a Developer ID signed app, this practice this corresponds to the Developer ID certificate.
+    ///
+    /// - Parameter staticCode: On disk representation.
+    /// - Throws: If unable to determine the certificate.
+    /// - Returns: The leaf certificate.
+    static func copyLeafCertificate(staticCode: SecStaticCode) throws -> SecCertificate {
         var info: CFDictionary?
         let flags = SecCSFlags(rawValue: kSecCSSigningInformation)
         if SecCodeCopySigningInformation(staticCode, flags, &info) == errSecSuccess,
            let info = info as NSDictionary?,
            let certificates = info[kSecCodeInfoCertificates as String] as? [SecCertificate],
-           let leafCertificate = certificates.first,
-           let leafKey = SecCertificateCopyKey(leafCertificate),
+           let leafCertificate = certificates.first {
+                return leafCertificate
+        }
+        
+        throw CodeInfoError.leafCertificateNotRetrievable
+    }
+    
+    /// Returns the signing key in data form for the leaf certificate in the certificate chain.
+    ///
+    /// - Parameters:
+    ///  - staticCode: On disk representation.
+    /// - Throws: If unable to copy the data.
+    /// - Returns: Signing key in data form for the leaf certificate in the certificate chain.
+    private static func copyLeafCertificateKeyData(staticCode: SecStaticCode) throws -> Data {
+        let leafCertificate = try copyLeafCertificate(staticCode: staticCode)
+        if let leafKey = SecCertificateCopyKey(leafCertificate),
            let leafKeyData = SecKeyCopyExternalRepresentation(leafKey, nil) as Data? {
                 return leafKeyData
         }
