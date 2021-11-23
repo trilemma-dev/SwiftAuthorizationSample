@@ -622,7 +622,7 @@
 			repositoryURL = "https://github.com/trilemma-dev/EmbeddedPropertyList";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 2.0.0;
 			};
 		};
 		99A67B312723B2D200F7D92D /* XCRemoteSwiftPackageReference "SecureXPC" */ = {

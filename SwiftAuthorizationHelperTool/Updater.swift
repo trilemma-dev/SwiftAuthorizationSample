@@ -45,7 +45,7 @@ enum Updater {
     /// - Throws: If unable to read the info property lists of this helper tool or the one located at `atPath`.
     /// - Returns: If the helper tool at the location specified by `atPath` is newer than the one running this code and the versions of both.
     private static func isHelperToolNewerVersion(atPath helperTool: URL)
-        throws -> (isNewer: Bool, current: Version, other: Version) {
+        throws -> (isNewer: Bool, current: BundleVersion, other: BundleVersion) {
         let current = try HelperToolInfoPropertyList.main().version
         let other = try HelperToolInfoPropertyList.init(from: helperTool).version
         

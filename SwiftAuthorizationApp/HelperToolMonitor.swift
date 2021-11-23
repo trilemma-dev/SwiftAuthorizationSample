@@ -26,7 +26,7 @@ class HelperToolMonitor {
         /// The helper tool run by launchd exists on disk.
         let helperToolExists: Bool
         /// The `CFBundleVersion` of the helper tool on disk. Will be non-nil if `helperToolExists` is `true`.
-        let helperToolBundleVersion: Version?
+        let helperToolBundleVersion: BundleVersion?
     }
     
     /// Directories containing installed helper tools and their registration property lists.
@@ -97,7 +97,7 @@ class HelperToolMonitor {
         let registrationPropertyListExists = FileManager.default
                                                         .fileExists(atPath: constants.blessedPropertyListLocation.path)
         
-        let helperToolBundleVersion: Version?
+        let helperToolBundleVersion: BundleVersion?
         let helperToolExists: Bool
         do {
             let infoPropertyList = try HelperToolInfoPropertyList(from: constants.blessedLocation)

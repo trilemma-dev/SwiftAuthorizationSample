@@ -24,7 +24,7 @@ class ViewController: NSViewController {
     /// Monitors the helper tool, if installed.
     private var monitor: HelperToolMonitor?
     /// The version of the helper tool bundled with this app (not necessarily the version installed).
-    private var bundledHelperToolVersion: Version?
+    private var bundledHelperToolVersion: BundleVersion?
     /// Used to communicate with the helper tool.
     private var xpcClient: XPCMachClient?
     /// Authorization instance used for the run of this app. This needs a persistent scope because once the authorization instance is deinitialized it will no longer be

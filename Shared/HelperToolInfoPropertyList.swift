@@ -13,7 +13,7 @@ struct HelperToolInfoPropertyList: Decodable {
     /// Value for `SMAuthorizedClients`.
     let authorizedClients: [String]
     /// Value for `CFBundleVersion`.
-    let version: Version
+    let version: BundleVersion
     /// Value for `CFBundleIdentifier`.
     let bundleIdentifier: String
     
