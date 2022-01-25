@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/trilemma-dev/Blessed",
         "state": {
           "branch": null,
-          "revision": "ef63245fc790152ec92a99b1f792f570c01a6769",
-          "version": "0.2.0"
+          "revision": "cb77d0c60cae915728475d7f39d841a8e6a61460",
+          "version": "0.1.0"
         }
       },
       {
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/trilemma-dev/EmbeddedPropertyList",
         "state": {
           "branch": null,
-          "revision": "4f3a0976e0c4a83df3c2c859288794a8372732c1",
-          "version": "2.0.0"
+          "revision": "bc65bbba59436df38a6ce441d09b50d08f23e14c",
+          "version": "2.0.1"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/trilemma-dev/SecureXPC",
         "state": {
           "branch": null,
-          "revision": "81f098d15af9b63b4677837cfb30e66f33605e2e",
-          "version": "0.2.2"
+          "revision": "888c5a3f0f0ba1502d12136a54585b68aaaeaa51",
+          "version": "0.3.0"
         }
       }
     ]

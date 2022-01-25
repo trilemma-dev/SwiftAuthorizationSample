@@ -22,13 +22,14 @@ struct SharedConstants {
     /// Authorization right used to force user to authenticate as admin before performing an action.
     static let exampleRight = AuthorizationRight(name: "com.example.SwiftAuthorizationSample.secure-action")
     /// XPC route to run an allowed command as root.
-    static let allowedCommandRoute = XPCRouteWithMessageWithReply("process",
-                                                                  messageType: AllowedCommandMessage.self,
-                                                                  replyType: AllowedCommandReply.self)
+    static let allowedCommandRoute = XPCRoute.named("process")
+                                             .withMessageType(AllowedCommandMessage.self)
+                                             .withReplyType(AllowedCommandReply.self)
     /// XPC route to uninstall the helper tool.
-    static let uninstallRoute = XPCRouteWithoutMessageWithoutReply("uninstall")
+    static let uninstallRoute = XPCRoute.named("uninstall")
     /// XPC route to update the helper tool.
-    static let updateRoute = XPCRouteWithMessageWithoutReply("update", messageType: URL.self)
+    static let updateRoute = XPCRoute.named("update")
+                                     .withMessageType(URL.self)
     
     /// The label of the helper tool. This is required by SMJobBless to match its filename.
     let helperToolLabel: String

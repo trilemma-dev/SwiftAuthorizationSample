@@ -21,12 +21,17 @@ class ViewController: NSViewController {
     @IBOutlet weak var runButton: NSButton!
     @IBOutlet weak var outputText: NSTextView!
     
+    // Initialized in viewDidLoad()
+    
     /// Monitors the helper tool, if installed.
-    private var monitor: HelperToolMonitor?
+    private var monitor: HelperToolMonitor!
+    /// The location of the helper tool bundlded with this app.
+    private var bundledLocation: URL!
     /// The version of the helper tool bundled with this app (not necessarily the version installed).
-    private var bundledHelperToolVersion: BundleVersion?
+    private var bundledHelperToolVersion: BundleVersion!
     /// Used to communicate with the helper tool.
-    private var xpcClient: XPCMachClient?
+    private var xpcClient: XPCClient!
+    
     /// Authorization instance used for the run of this app. This needs a persistent scope because once the authorization instance is deinitialized it will no longer be
     /// valid system-wide, including in other processes such as the helper tool.
     private var authorization: Authorization?
@@ -47,19 +52,20 @@ class ViewController: NSViewController {
         // Have this button call this target when clicked, the specific function called will differ
         self.installOrUpdateButton.target = self
 
-        // Create monitor that updates UI for: install, uninstall, update, & version info
-        if let sharedConstants = (NSApplication.shared.delegate as? AppDelegate)?.sharedConstants {
-            let monitor = HelperToolMonitor(constants: sharedConstants)
-            self.updateInstallationStatus(monitor.determineStatus())
-            monitor.start(changeOccurred: updateInstallationStatus)
-            self.monitor = monitor
-            
-            self.xpcClient = XPCMachClient(machServiceName: sharedConstants.machServiceName)
-            
-            if let bundledLocation = sharedConstants.bundledLocation {
-                self.bundledHelperToolVersion = try? HelperToolInfoPropertyList(from: bundledLocation).version
-            }
+        // Initialize variables using the app's shared constants
+        guard let sharedConstants = (NSApplication.shared.delegate as? AppDelegate)?.sharedConstants else {
+            fatalError("Unable to access AppDelegate's shared constants")
         }
+        let monitor = HelperToolMonitor(constants: sharedConstants)
+        self.updateInstallationStatus(monitor.determineStatus())
+        monitor.start(changeOccurred: updateInstallationStatus)
+        self.monitor = monitor
+        self.xpcClient = XPCClient.forMachService(named: sharedConstants.machServiceName)
+        guard let bundledLocation = sharedConstants.bundledLocation else {
+            fatalError("Bundled helper tool location should always be determinable by the app")
+        }
+        self.bundledHelperToolVersion = try! HelperToolInfoPropertyList(from: bundledLocation).version
+        self.bundledLocation = bundledLocation
     }
     
     override func viewWillAppear() {
@@ -228,41 +234,43 @@ class ViewController: NSViewController {
     
     /// Attempts to update the helper tool by having the helper tool perform a self update.
     @objc func update(_ sender: NSButton) {
-        if let xpcClient = xpcClient,
-           let sharedConstants = (NSApplication.shared.delegate as? AppDelegate)?.sharedConstants,
-           let bundledLocation = sharedConstants.bundledLocation {
-            do {
-                try xpcClient.sendMessage(bundledLocation, route: SharedConstants.updateRoute)
-            } catch {
-                self.showModal(title: "Update Failed", message: String(describing: error))
+        self.xpcClient.sendMessage(self.bundledLocation, route: SharedConstants.updateRoute) { response in
+            if case .failure(let error) = response {
+                switch error {
+                    case .connectionInterrupted:
+                        () // It's expected the connection is interrupted as part of updating the client
+                    default:
+                        self.showModal(title: "Update Failed", message: String(describing: error))
+                }
             }
-        } else {
-            self.showModal(title: "Update Failed", message: "Could not communicate with helper tool")
         }
     }
     
     /// Attempts to uninstall the helper tool by having the helper tool uninstall itself.
     @IBAction func uninstall(_ sender: NSButton) {
-        if let xpcClient = xpcClient {
-            do {
-                try xpcClient.send(route: SharedConstants.uninstallRoute)
-            } catch {
-                self.showModal(title: "Uninstall Failed", message: String(describing: error))
+        self.xpcClient.send(route: SharedConstants.uninstallRoute) { response in
+            if case .failure(let error) = response {
+                switch error {
+                    case .connectionInterrupted:
+                        () // It's expected the connection is interrupted as part of uninstalling the client
+                    default:
+                        self.showModal(title: "Uninstall Failed", message: String(describing: error))
+                }
             }
-        } else {
-            self.showModal(title: "Uninstall Failed", message: "Could not communicate with helper tool")
         }
     }
     
     /// Show a modal to the user. In practice used to communicate an error.
     private func showModal(title: String, message: String) {
-        if let window = self.view.window {
-            let alert = NSAlert()
-            alert.messageText = title
-            alert.informativeText = message
-            alert.addButton(withTitle: "OK")
-            alert.beginSheetModal(for: window, completionHandler: nil)
-            _ = NSApp.runModal(for: window)
+        DispatchQueue.main.async {
+            if let window = self.view.window {
+                let alert = NSAlert()
+                alert.messageText = title
+                alert.informativeText = message
+                alert.addButton(withTitle: "OK")
+                alert.beginSheetModal(for: window, completionHandler: nil)
+                _ = NSApp.runModal(for: window)
+            }
         }
     }
     
@@ -270,25 +278,26 @@ class ViewController: NSViewController {
     @IBAction func run(_ sender: NSButton) {
         self.outputText.string = "" // Immediately clear the output, response to shown will be returned async
         
-        if let command = commandPopup.selectedItem?.representedObject as? AllowedCommand,
-           let xpcClient = self.xpcClient {
+        guard let command = commandPopup.selectedItem?.representedObject as? AllowedCommand else {
+            fatalError("Command popup contained unexpected item")
+        }
+        
+        // If authorization is needed, try to create one, if we fail early exit this function
+        if command.requiresAuth && self.authorization == nil {
             do {
-                if command.requiresAuth && self.authorization == nil {
-                    self.authorization = try Authorization()
-                }
-                try xpcClient.sendMessage(AllowedCommandMessage(command: command, authorization: self.authorization),
-                                          route: SharedConstants.allowedCommandRoute,
-                                          withReply: displayAllowedCommandResponse(_:))
+                self.authorization = try Authorization()
             } catch {
                 DispatchQueue.main.async {
                     self.outputText.textColor = NSColor.systemRed
                     self.outputText.string = String(describing: error)
                 }
+                return
             }
-        } else {
-            self.outputText.textColor = NSColor.systemRed
-            self.outputText.string = "Unable to communicate with helper tool"
         }
+        
+        self.xpcClient.sendMessage(AllowedCommandMessage(command: command, authorization: self.authorization),
+                                   route: SharedConstants.allowedCommandRoute,
+                                   withResponse: self.displayAllowedCommandResponse(_:))
     }
     
     /// Displays the response of requesting the helper tool run the command.
@@ -307,7 +316,7 @@ class ViewController: NSViewController {
                     }
                 case let .failure(error):
                     self.outputText.textColor = NSColor.systemRed
-                    if case let .remote(description) = error {
+                    if case let .other(description) = error {
                         self.outputText.string = description
                     } else {
                         self.outputText.string = String(describing: error)
