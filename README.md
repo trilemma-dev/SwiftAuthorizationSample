@@ -238,11 +238,11 @@ changes to framework dependencies will *not* cause an autoincrement.
 Communication between your app and the helper tool should be thought of as a client server relationship.  Your app
 functions as the client and the helper tool as the server. Similarly to communicating with a server over the Internet,
 your app neither starts nor stops the server. While in theory there are multiple ways for your app to communicate with
-the helper tool, in practice an XPC Mach Service should be used. Note that while this uses XPC for communication, this
-does **not** make the helper tool an XPC Service.
+the helper tool, in practice an XPC Mach service should be used. Note that while this uses XPC for communication, this
+does **not** make the helper tool an XPC service.
 
-launchd will ensure your helper tool is running if it needs to handle a request. If it was not already running when you
-made a request, expect a small amount of initial latency.
+`launchd` will ensure your helper tool is running if it needs to handle a request. If it was not already running when
+you made a request, expect a small amount of initial latency.
 
 Apple provides both C and Objective C APIs for XPC communication. Unfortunately, as of macOS 12 the Objective C API does
 not provide a publicly documented way to secure the connection. (See
@@ -258,8 +258,8 @@ from communicating with the helper tool.
 Note: While XPC allows for sending certain types of live references such as file descriptors, the SecureXPC framework
 does not support this — it only sends serializable data.
 
-### Registering an XPC Mach Server
-For the helper tool to be an XPC Mach server, it must register to be one in its launchd property list. The build script
+### Registering an XPC Mach service
+For the helper tool to be an XPC Mach service, it must register to be one in its launchd property list. The build script
 can do this for you automatically be adding the "specify-mach-services" argument. If you want this to be cleaned up at
 the end of the build process, then for that Run Script Phase add the "cleanup-mach-services" argument. This sample is
 configured to do both.
