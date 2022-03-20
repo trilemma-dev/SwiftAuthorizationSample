@@ -234,7 +234,7 @@ class ViewController: NSViewController {
     
     /// Attempts to update the helper tool by having the helper tool perform a self update.
     @objc func update(_ sender: NSButton) {
-        self.xpcClient.sendMessage(self.bundledLocation, route: SharedConstants.updateRoute) { response in
+        self.xpcClient.sendMessage(self.bundledLocation, to: SharedConstants.updateRoute) { response in
             if case .failure(let error) = response {
                 switch error {
                     case .connectionInterrupted:
@@ -248,7 +248,7 @@ class ViewController: NSViewController {
     
     /// Attempts to uninstall the helper tool by having the helper tool uninstall itself.
     @IBAction func uninstall(_ sender: NSButton) {
-        self.xpcClient.send(route: SharedConstants.uninstallRoute) { response in
+        self.xpcClient.send(to: SharedConstants.uninstallRoute) { response in
             if case .failure(let error) = response {
                 switch error {
                     case .connectionInterrupted:
@@ -296,7 +296,7 @@ class ViewController: NSViewController {
         }
         
         self.xpcClient.sendMessage(AllowedCommandMessage(command: command, authorization: self.authorization),
-                                   route: SharedConstants.allowedCommandRoute,
+                                   to: SharedConstants.allowedCommandRoute,
                                    withResponse: self.displayAllowedCommandResponse(_:))
     }
     
@@ -316,11 +316,7 @@ class ViewController: NSViewController {
                     }
                 case let .failure(error):
                     self.outputText.textColor = NSColor.systemRed
-                    if case let .other(description) = error {
-                        self.outputText.string = description
-                    } else {
-                        self.outputText.string = String(describing: error)
-                    }
+                    self.outputText.string = String(describing: error)
             }
         }
     }

@@ -32,7 +32,7 @@ if CommandLine.arguments.count > 1 {
     server.registerRoute(SharedConstants.allowedCommandRoute, handler: AllowedCommandRunner.run(message:))
     server.registerRoute(SharedConstants.uninstallRoute, handler: Uninstaller.uninstallFromXPC)
     server.registerRoute(SharedConstants.updateRoute, handler: Updater.updateHelperTool(atPath:))
-    server.errorHandler = { error in
+    server.setErrorHandler { error in
         if case .connectionInvalid = error {
             // Ignore invalidated connections as this happens whenever the client disconnects which is not a problem
         } else {

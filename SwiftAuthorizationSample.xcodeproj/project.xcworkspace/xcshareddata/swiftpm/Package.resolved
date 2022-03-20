@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/trilemma-dev/Blessed",
         "state": {
           "branch": null,
-          "revision": "cb77d0c60cae915728475d7f39d841a8e6a61460",
-          "version": "0.1.0"
+          "revision": "ef63245fc790152ec92a99b1f792f570c01a6769",
+          "version": "0.2.0"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/trilemma-dev/SecureXPC",
         "state": {
           "branch": null,
-          "revision": "a96f1d3303db0b08984557190a62c95b954bdc02",
-          "version": "0.3.1"
+          "revision": "457212c348f6a8d5af22194728f8b928f20b0ea9",
+          "version": "0.4.0"
         }
       }
     ]

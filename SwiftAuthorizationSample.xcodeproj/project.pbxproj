@@ -630,7 +630,7 @@
 			repositoryURL = "https://github.com/trilemma-dev/SecureXPC";
 			requirement = {
 				kind = upToNextMinorVersion;
-				minimumVersion = 0.3.1;
+				minimumVersion = 0.4.0;
 			};
 		};
 		99A67B372723B2FC00F7D92D /* XCRemoteSwiftPackageReference "Blessed" */ = {
@@ -638,7 +638,7 @@
 			repositoryURL = "https://github.com/trilemma-dev/Blessed";
 			requirement = {
 				kind = upToNextMinorVersion;
-				minimumVersion = 0.1.0;
+				minimumVersion = 0.2.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
