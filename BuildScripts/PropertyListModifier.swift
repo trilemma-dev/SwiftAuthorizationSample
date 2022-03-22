@@ -123,7 +123,7 @@ func organizationalUnitRequirement() throws -> String {
             throw ScriptError.general("Development Team for code signing is invalid: \(developmentTeamId)")
         }
     }
-    let certificateString = "certificate leaf[subject.OU] = \(developmentTeamId)"
+    let certificateString = "certificate leaf[subject.OU] = \"\(developmentTeamId)\""
     
     return certificateString
 }
