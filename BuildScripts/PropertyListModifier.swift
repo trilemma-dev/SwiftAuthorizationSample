@@ -307,26 +307,26 @@ func hashSources() throws -> String {
 /// Represents the value corresponding to the key `CFBundleVersionKey` in the info property list.
 struct BundleVersion {
     let version: String
-    let major: Int
-    let minor: Int
-    let patch: Int
+    private let major: Int
+    private let minor: Int?
+    private let patch: Int?
     
     init?(version: String) {
         self.version = version
-        
+
         let versionParts = version.split(separator: ".")
         if versionParts.count == 1,
            let major = Int(versionParts[0]) {
             self.major = major
-            self.minor = 0
-            self.patch = 0
+            self.minor = nil
+            self.patch = nil
         }
         else if versionParts.count == 2,
             let major = Int(versionParts[0]),
             let minor = Int(versionParts[1]) {
             self.major = major
             self.minor = minor
-            self.patch = 0
+            self.patch = nil
         }
         else if versionParts.count == 3,
             let major = Int(versionParts[0]),
@@ -341,16 +341,32 @@ struct BundleVersion {
         }
     }
     
-    private init(major: Int, minor: Int, patch: Int) {
+    private init(major: Int, minor: Int? = nil, patch: Int? = nil) {
         self.major = major
         self.minor = minor
         self.patch = patch
-        
-        self.version = "\(major).\(minor).\(patch)"
+
+        if let patch = patch {
+            self.version = "\(major).\(minor ?? 0).\(patch)"
+        }
+        else if let minor = minor {
+            self.version = "\(major).\(minor)"
+        }
+        else {
+            self.version = "\(major)"
+        }
     }
     
     func incrementPatch() -> BundleVersion {
-        return BundleVersion(major: self.major, minor: self.minor, patch: self.patch + 1)
+        if let patch = self.patch {
+            return BundleVersion(major: self.major, minor: self.minor, patch: patch + 1)
+        }
+
+        if let minor = self.minor {
+            return BundleVersion(major: self.major, minor: minor + 1)
+        }
+
+        return BundleVersion(major: self.major + 1)
     }
 }
 
