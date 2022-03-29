@@ -305,52 +305,53 @@ func hashSources() throws -> String {
 }
 
 /// Represents the value corresponding to the key `CFBundleVersionKey` in the info property list.
-struct BundleVersion {
-    let version: String
-    let major: Int
-    let minor: Int
-    let patch: Int
+enum BundleVersion {
+    case major(UInt)
+    case majorMinor(UInt, UInt)
+    case majorMinorPatch(UInt, UInt, UInt)
     
     init?(version: String) {
-        self.version = version
-        
         let versionParts = version.split(separator: ".")
         if versionParts.count == 1,
-           let major = Int(versionParts[0]) {
-            self.major = major
-            self.minor = 0
-            self.patch = 0
+           let major = UInt(versionParts[0]) {
+            self = .major(major)
         }
         else if versionParts.count == 2,
-            let major = Int(versionParts[0]),
-            let minor = Int(versionParts[1]) {
-            self.major = major
-            self.minor = minor
-            self.patch = 0
+            let major = UInt(versionParts[0]),
+            let minor = UInt(versionParts[1]) {
+            self = .majorMinor(major, minor)
         }
         else if versionParts.count == 3,
-            let major = Int(versionParts[0]),
-            let minor = Int(versionParts[1]),
-            let patch = Int(versionParts[2]) {
-            self.major = major
-            self.minor = minor
-            self.patch = patch
+            let major = UInt(versionParts[0]),
+            let minor = UInt(versionParts[1]),
+            let patch = UInt(versionParts[2]) {
+            self = .majorMinorPatch(major, minor, patch)
         }
         else {
             return nil
         }
     }
     
-    private init(major: Int, minor: Int, patch: Int) {
-        self.major = major
-        self.minor = minor
-        self.patch = patch
-        
-        self.version = "\(major).\(minor).\(patch)"
+    var version: String {
+        switch self {
+            case .major(let major):
+                return "\(major)"
+            case .majorMinor(let major, let minor):
+                return "\(major).\(minor)"
+            case .majorMinorPatch(let major, let minor, let patch):
+                return "\(major).\(minor).\(patch)"
+        }
     }
     
-    func incrementPatch() -> BundleVersion {
-        return BundleVersion(major: self.major, minor: self.minor, patch: self.patch + 1)
+    func increment() -> BundleVersion {
+        switch self {
+            case .major(let major):
+                return .major(major + 1)
+            case .majorMinor(let major, let minor):
+                return .majorMinor(major, minor + 1)
+            case .majorMinorPatch(let major, let minor, let patch):
+                return .majorMinorPatch(major, minor, patch + 1)
+        }
     }
 }
 
@@ -379,7 +380,7 @@ func incrementBundleVersionIfNeeded(infoPropertyListPath: URL) throws {
     let currentBuildHash = try hashSources()
     if currentBuildHash != previousBuildHash {
         let version = try readBundleVersion(propertyList: propertyList.entries)
-        let newVersion = version.incrementPatch()
+        let newVersion = version.increment()
         
         propertyList.entries[BuildHashKey] = currentBuildHash
         propertyList.entries[CFBundleVersionKey] = newVersion.version
