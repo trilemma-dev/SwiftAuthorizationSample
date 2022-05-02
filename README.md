@@ -215,7 +215,7 @@ Next we'll configure the build script to run for the helper tool:
 2. Switch to the Build Phases tab
 3. Add a Run Script Phase which occurs right after the Dependencies Phase
 4. Set the command to be run as
-   `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift satisfy-job-bless-requirements auto-increment-version`
+   `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift satisfy-job-bless-requirements specify-mach-services auto-increment-version`
    
 By specifying "satisfy-job-bless-requirements", the script will add the `SMAuthorizedClients` entry to the helper tool's
 info property list and the `Label` entry to the launchd property list each time the app is built. The code signing
@@ -225,14 +225,14 @@ requires that the app be the same version or greater than the one which installe
 If you do not want these entries to be persisted as part of the info or launchd property lists:
 
 5. Add a Run Script Phase as the last phase
-6. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift cleanup-job-bless-requirements`
+6. Set the command to be run as `"${SRCROOT}"/BuildScripts/PropertyListModifier.swift cleanup-job-bless-requirements cleanup-mach-services`
 
-By specifying "auto-increment-version", the script will increment the patch value of the `CFBundleVersion` entry if the 
-source code has changed. In order for the script to determine if the source code has changed it creates an entry in your
-helper tool's info property list with the `BuildHash` key and a value equal to the SHA256 hash of the helper tool's
-source code. For the version number to continue autoincrementing you'll need to commit these changes. If you do not want
-this autoincrement behavior, do not specify `auto-increment-version` as an argument for the build script. Note that
-changes to framework dependencies will *not* cause an autoincrement.
+By specifying "auto-increment-version", the script will increment the value of the `CFBundleVersion` entry if the source
+code has changed. In order for the script to determine if the source code has changed it creates an entry in your helper
+tool's info property list with the `BuildHash` key and a value equal to the SHA256 hash of the helper tool's source
+code. For the version number to continue autoincrementing you'll need to commit these changes. If you do not want this
+autoincrement behavior, do not specify `auto-increment-version` as an argument for the build script. Note that changes
+to framework dependencies will *not* cause an autoincrement.
 
 ## Communicating With a Helper Tool
 Communication between your app and the helper tool should be thought of as a client server relationship.  Your app
@@ -283,7 +283,7 @@ your app.
 
 What may be less obvious is it's also important that your app update contain a new version of privileged helper tool and
 that this helper tool be updated on end users' Macs. The helper tool does not need any code changes, it just needs to be
-a new version such that it will accepted as an update.
+a new version such that it will be accepted as an update.
 
 If there's no code change, why is this needed? This is because while the code has not changed, the `SMAuthorizedClients`
 entry in its info property list will have. Every time the project is built, the `PropertyListModifier.swift` build
