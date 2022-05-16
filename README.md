@@ -47,7 +47,7 @@ Three Swift frameworks were created specifically for this helper tool use case:
   - Enables advanced use cases with a full implementation of Authorization Services and Service Management
 - [SecureXPC](https://github.com/trilemma-dev/SecureXPC): Communication between your app and helper tool
   - Easily send and receive [Codable](https://developer.apple.com/documentation/swift/codable) instances
-  - Designed specifically for secure XPC Mach Services connections, which by default allow any process to communicate
+  - Designed for secure XPC Mach service connections, which by default allow any process to communicate
 - [EmbeddedPropertyList](https://github.com/trilemma-dev/EmbeddedPropertyList): Embedded property list reader
   - Directly read the info and launchd property lists embedded in the helper tool
 
