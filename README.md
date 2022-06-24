@@ -1,4 +1,8 @@
-SwiftAuthorizationSample demonstrates how to run privileged operations on macOS using a helper tool managed by launchd.
+SwiftAuthorizationSample demonstrates how to run privileged operations on OS X 10.10 through macOS 12 using a helper
+tool installed with `SMJobBless` and communicate with it using XPC.
+
+(Note: Starting with macOS 13, Apple provides a different approach via 
+[`SMAppService`](https://developer.apple.com/documentation/servicemanagement/smappservice).)
 
 This sample was created with the expectation that you already have an app and are looking to add a privileged helper
 tool in order to perform one or more operations as root. As such this sample is **not** a template and is instead
@@ -33,23 +37,33 @@ cannot be written in Swift or [Swift 5 Runtime Support for Command Line Tools](h
 be installed. This is because the helper tool must be a Command Line Tool (not an app bundle) and starting with Swift 5
 and Xcode 10.2, Apple made the decision to end support for embedding the Swift runtime into Command Line Tools.
 
-Note: The helper tool, once installed, will **not** be run from inside of your app bundle and so it cannot target any
-Swift runtime bundled with your app. (This is unlike XPC Services which may do this.)
+The helper tool cannot make use of [Swift concurrency](https://docs.swift.org/swift-book/LanguageGuide/Concurrency.html)
+prior to macOS 12. This is also because the helper tool must be a Command Line Tool and Apple chose to only implement
+Swift concurrency backwards compatability on macOS 10.15 and 11 for app bundles. While code containing Swift concurrency
+will compile, it will crash at run time.
 
-All three Swift frameworks used by this sample target macOS 10.10 and later.
+Note: The helper tool, once installed, will **not** be run from inside of your app bundle and so it cannot target any
+Swift runtime or concurrency framework bundled with your app. (This is unlike XPC Services which may do this.)
+
+All of the Swift packages used by this sample target macOS 10.10 and later.
 
 ## Dependencies
-Three Swift frameworks were created specifically for this helper tool use case:
+Several Swift packages were created specifically for this helper tool use case:
 
 - [Blessed](https://github.com/trilemma-dev/Blessed): Helper tool installation
-  - Makes [SMJobBless](https://developer.apple.com/documentation/servicemanagement/1431078-smjobbless) functionality a
-    single function call; no need to directly use Authorization Services
-  - Enables advanced use cases with a full implementation of Authorization Services and Service Management
+  - Makes [`SMJobBless`](https://developer.apple.com/documentation/servicemanagement/1431078-smjobbless) functionality a
+    single function call; no need to directly use the Service Management & Authorization Services frameworks
 - [SecureXPC](https://github.com/trilemma-dev/SecureXPC): Communication between your app and helper tool
   - Easily send and receive [Codable](https://developer.apple.com/documentation/swift/codable) instances
   - Designed for secure XPC Mach service connections, which by default allow any process to communicate
 - [EmbeddedPropertyList](https://github.com/trilemma-dev/EmbeddedPropertyList): Embedded property list reader
   - Directly read the info and launchd property lists embedded in the helper tool
+- [Authorized](https://github.com/trilemma-dev/Authorized): Self-restriction of certain actions
+  - In most cases you probably won't make direct use of this; it is a dependency of Blessed
+  - Provides a full Swift implementation of Authorization Services to enable advanced use cases
+- [Required](https://github.com/trilemma-dev/Required): Parser & evaluator of code signing requirements
+  - While not directly used by this sample, it's a dependency of Blessed
+  - This helps Blessed to generate detailed error messages in case `SMJobBless` fails 
 
 These are collectively [available as a package collection](https://swiftpackageindex.com/trilemma-dev/collection.json)
 which you can [add to Xcode 13 or later](https://swiftpackageindex.com/package-collections).
@@ -57,12 +71,12 @@ which you can [add to Xcode 13 or later](https://swiftpackageindex.com/package-c
 Each of these frameworks have their own READMEs as well as full DocC documentation.
 
 ##  Installing a Helper Tool
-macOS allows non-sandboxed apps to indirectly run code as root by installing a privileged helper tool. If you were to
-directly use Apple's APIs you'd use the
+macOS 12 and earlier allows non-sandboxed apps to indirectly run code as root by installing a privileged helper tool. If
+you were to directly use Apple's APIs you'd use the
 [Authorization Services](https://developer.apple.com/documentation/security/authorization_services)
 framework to have the user authenticate as an admin and then call 
 [`SMJobBless`](https://developer.apple.com/documentation/servicemanagement/1431078-smjobbless) to perform
-the installation. The [Blessed](https://github.com/trilemma-dev/Blessed) framework used by this sample simplifies this
+the installation. The [Blessed](https://github.com/trilemma-dev/Blessed) package used by this sample simplifies this
 to just one function call.
 
 If this operation succeeds the helper tool will be copied from the `Contents/Library/LaunchServices` directory inside
@@ -73,10 +87,8 @@ For this operation to succeed, Apple imposes numerous requirements:
 
 1. Your app **must** be signed.
 2. The helper tool **must** be signed.
-3. The helper tool **must** be located in the `Contents/Library/LaunchServices` directory inside your app's bundle.
-4. The filename of the helper tool **should** be reverse-DNS format.
-    - If your app has the bundle identifier "com.example.SwiftAuthorizationApp" then your helper tool **may** have a
-      filename of "com.example.SwiftAuthorizationApp.helper".
+3. The helper tool **must** be located in the `Contents/Library/LaunchServices` directory inside the app's bundle.
+4. The helper tool **must** be an executable, not an app bundle.
 5. The helper tool **must** have an embedded launchd property list.
 6. The helper tool's embedded launchd property list **must** have an entry with `Label` as the key and the value
    **must** be the filename of the helper tool.
@@ -85,23 +97,27 @@ For this operation to succeed, Apple imposes numerous requirements:
    [`SMAuthorizedClients`](https://developer.apple.com/documentation/bundleresources/information_property_list/smauthorizedclients)
    as its key and its value **must** be an array of strings. Each string **must** be a
    [code signing requirement](https://developer.apple.com/library/archive/documentation/Security/Conceptual/CodeSigningGuide/RequirementLang/RequirementLang.html).
-   Your app **must** satisify at least one of these requirements.
-    - Only processes which meet one or more of these requirements may install or update the helper tool. 
-    - These requirements are *only* about which processes may install or update the helper tool. They impose no 
-      restrictions on which processes can communicate with the helper tool.
-9. The helper tool's embedded info property list **must** have an entry with 
+   The app **must** satisify at least one of these requirements.
+    - The app must satisify one or more of these requirements to install or update the helper tool.
+        - To update the helper tool, the app must satisfy one or more requirements of both the installed helper tool and
+          the bundled helper tool.
+    - These requirements are *only* about whether an app can install or update the helper tool. They impose no
+      restrictions on communication with the helper tool.
+9. The helper tool's embedded info property list **must** have an entry with
    [`CFBundleVersion`](https://developer.apple.com/documentation/bundleresources/information_property_list/cfbundleversion)
    as its key and its value **must** be a string matching the format described in `CFBundleVersion`'s documentation.
     - This requirement is *not* documented by Apple, but is enforced.
-    - While not documented by Apple, `SMJobBless` will not overwrite an existing installation of a helper tool with one
-      that has an equal or lower value for its `CFBundleVersion` entry.
-    - Despite Apple requiring the info property list contain a key named `CFBundleVersion`, your helper tool **must**
-      be a Command Line Tool and **must not** be a bundle.
-10. Your app's Info.plist **must** have an entry with 
-      [`SMPrivilegedExecutables`](https://developer.apple.com/documentation/bundleresources/information_property_list/smprivilegedexecutables)
+    - While not documented by Apple, calling this function will not overwrite an existing installation of a helper tool
+      with one that has an equal or lower value for its `CFBundleVersion` entry.
+    - Despite Apple requiring the info property list contain a key named `CFBundleVersion`, the helper tool **must** be
+      a Command Line Tool and **must not** be a bundle.
+10. Your app's Info.plist **must** have an entry with [`SMPrivilegedExecutables`](https://developer.apple.com/documentation/bundleresources/information_property_list/smprivilegedexecutables)
     as its key and its value must be a dictionary. Each dictionary key **must** be a helper tool's filename; for example
     "com.example.SwiftAuthorizationApp.helper". Each dictionary value **must** be a string representation of a code
     signing requirement that the helper tool satisfies.
+
+If your implementation does not meet these requirements, blessing will fail. The Blessed package will identify each
+missing requirement along with a detail explanation as the thrown `BlessError`.
 
 ### Satisfying These Requirements
 While Apple imposes numerous requirements, many of them only need to be configured once. For the remainder, this sample
@@ -159,9 +175,9 @@ Note that the setting of some target specific values in the project level Config
 processes needs access to this information. For example, at build time the app needs to know the identifier for the
 helper tool in order to generate its `SMPrivilegedExecutables` entry.
 
-#### 4. Helper Tool Filename
-If you configured the build variables to match the sample, then what you specified as the value for the key
-`HELPER_TOOL_BUNDLE_IDENTIFIER` will be used as the filename for the helper tool.
+#### 4. Helper Tool Executable
+The helper tool in this sample is configured to be a Command Line Tool. This will result in a single executable file
+being built by Xcode (unlike an application which produces a bundle directory).
 
 #### 5 & 7. Embedded launchd and Info Property Lists
 In the root of the helper tool directory create a Info property list file with a
@@ -179,7 +195,7 @@ Where `INFOPLIST_FILE` are `LAUNCHDPLIST_FILE` are build variables with values o
 
 Note: At runtime you can read the info property list as you would from an app bundle, but you cannot do so for the
       launchd property list. Neither of these property lists can be read externally as you would for an app bundle.
-      For this reason, the [EmbeddedPropertyList](https://github.com/trilemma-dev/EmbeddedPropertyList) Swift framework
+      For this reason, the [EmbeddedPropertyList](https://github.com/trilemma-dev/EmbeddedPropertyList) Swift package
       was created.
 
 #### 6, 8, 9, & 10. Property List Entries
@@ -254,9 +270,6 @@ requires all communication to be secured. It can be automatically configured to 
 as `SMAuthorizedClients` in the helper tool's info property list which is what this sample does. Used in this manner,
 the code signing requirement generated by `PropertyListModifier.swift` build script mitigates older versions of the app
 from communicating with the helper tool.
-
-Note: While XPC allows for sending certain types of live references such as file descriptors, the SecureXPC framework
-does not support this — it only sends serializable data.
 
 ### Registering an XPC Mach service
 For the helper tool to be an XPC Mach service, it must register to be one in its launchd property list. The build script
@@ -334,7 +347,7 @@ Monitor.
 
 ## App Architecture & UI
 The sample app's architecture and UI are not meant to serve as examples of how to best build a macOS app. Notably the
-UI  technology chosen needed to support back to macOS 10.14.4 which does not have SwiftUI.
+UI technology chosen needed to support back to macOS 10.14.4 which does not have SwiftUI.
 
 ## Other Considerations
 While this sample shows one app installing and communicating with one helper tool, the relationship can be many to 
