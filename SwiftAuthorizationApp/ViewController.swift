@@ -6,9 +6,10 @@
 //
 
 import Cocoa
+import Authorized
 import Blessed
-import SecureXPC
 import EmbeddedPropertyList
+import SecureXPC
 
 class ViewController: NSViewController {
     
@@ -81,17 +82,10 @@ class ViewController: NSViewController {
             let aboutItem = NSMenuItem(title: "About \(displayName)",
                                        action: #selector(ViewController.openGithubPage(_:)),
                                        keyEquivalent: "")
-            let printDiagnosticInfoItem = NSMenuItem(title: "Print Diagnostic Info",
-                                                     action: #selector(ViewController.printDiagnosticInfo(_:)),
-                                                     keyEquivalent: "")
             let quitItem = NSMenuItem(title: "Quit \(displayName)",
                                       action: #selector(NSApplication.terminate(_:)),
                                       keyEquivalent: "q")
-            menuItemOne.submenu?.items = [aboutItem,
-                                          NSMenuItem.separator(),
-                                          printDiagnosticInfoItem,
-                                          NSMenuItem.separator(),
-                                          quitItem]
+            menuItemOne.submenu?.items = [aboutItem, NSMenuItem.separator(), quitItem]
             menu.items = [menuItemOne]
             NSApplication.shared.mainMenu = menu
         }
@@ -101,10 +95,6 @@ class ViewController: NSViewController {
         if let url = URL(string: "https://github.com/trilemma-dev/SwiftAuthorizationSample") {
             NSWorkspace.shared.open(url)
         }
-    }
-    
-    @objc func printDiagnosticInfo(_ sender: Any?) {
-        DiagnosticSigningInfo.printDiagnosticInfo()
     }
     
     /// Updates the Installation section of the UI.
@@ -224,7 +214,8 @@ class ViewController: NSViewController {
     /// Attempts to install the helper tool, requiring user authorization.
     @objc func install(_ sender: NSButton) {
         do {
-            try LaunchdManager.authorizeAndBless(message: "Do you want to install the sample helper tool?")
+            try PrivilegedHelperManager.shared
+                                       .authorizeAndBless(message: "Do you want to install the sample helper tool?")
         } catch AuthorizationError.canceled {
             // No user feedback needed, user canceled
         } catch {
@@ -238,7 +229,7 @@ class ViewController: NSViewController {
             if case .failure(let error) = response {
                 switch error {
                     case .connectionInterrupted:
-                        () // It's expected the connection is interrupted as part of updating the client
+                        break // It's expected the connection is interrupted as part of updating the client
                     default:
                         self.showModal(title: "Update Failed", message: String(describing: error))
                 }
@@ -252,7 +243,7 @@ class ViewController: NSViewController {
             if case .failure(let error) = response {
                 switch error {
                     case .connectionInterrupted:
-                        () // It's expected the connection is interrupted as part of uninstalling the client
+                        break // It's expected the connection is interrupted as part of uninstalling the client
                     default:
                         self.showModal(title: "Uninstall Failed", message: String(describing: error))
                 }

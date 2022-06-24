@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Authorized
 import Blessed
 
 /// Commands which the helper tool is able to run.

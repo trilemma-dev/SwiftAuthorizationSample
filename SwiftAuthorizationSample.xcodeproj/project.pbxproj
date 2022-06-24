@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		995AF20B274A465200F855D1 /* DiagnosticSigningInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 995AF20A274A465200F855D1 /* DiagnosticSigningInfo.swift */; };
 		995AF20C274A586600F855D1 /* CodeInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A67B5727243FD800F7D92D /* CodeInfo.swift */; };
 		99662095272557FF00ECE5C7 /* EmbeddedPropertyList in Frameworks */ = {isa = PBXBuildFile; productRef = 99662094272557FF00ECE5C7 /* EmbeddedPropertyList */; };
 		996620972725580A00ECE5C7 /* EmbeddedPropertyList in Frameworks */ = {isa = PBXBuildFile; productRef = 996620962725580A00ECE5C7 /* EmbeddedPropertyList */; };
+		998D9C342865D623006224C4 /* Authorized in Frameworks */ = {isa = PBXBuildFile; productRef = 998D9C332865D623006224C4 /* Authorized */; };
 		99A67B332723B2D200F7D92D /* SecureXPC in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B322723B2D200F7D92D /* SecureXPC */; };
 		99A67B392723B2FC00F7D92D /* Blessed in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B382723B2FC00F7D92D /* Blessed */; };
 		99A67B3C2723B30800F7D92D /* Blessed in Frameworks */ = {isa = PBXBuildFile; productRef = 99A67B3B2723B30800F7D92D /* Blessed */; };
@@ -59,7 +59,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		995AF20A274A465200F855D1 /* DiagnosticSigningInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticSigningInfo.swift; sourceTree = "<group>"; };
 		99A67B4727240DB100F7D92D /* HelperToolMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperToolMonitor.swift; sourceTree = "<group>"; };
 		99A67B492724111200F7D92D /* HelperToolLaunchdPropertyList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperToolLaunchdPropertyList.swift; sourceTree = "<group>"; };
 		99A67B4C2724125200F7D92D /* HelperToolInfoPropertyList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperToolInfoPropertyList.swift; sourceTree = "<group>"; };
@@ -91,6 +90,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				99A67B392723B2FC00F7D92D /* Blessed in Frameworks */,
+				998D9C342865D623006224C4 /* Authorized in Frameworks */,
 				99A67B332723B2D200F7D92D /* SecureXPC in Frameworks */,
 				99662095272557FF00ECE5C7 /* EmbeddedPropertyList in Frameworks */,
 			);
@@ -149,7 +149,6 @@
 				99F409D427216B230010500C /* Main.storyboard */,
 				99F409D227216B230010500C /* Assets.xcassets */,
 				99F6E8552729484500ED2001 /* Info.plist */,
-				995AF20A274A465200F855D1 /* DiagnosticSigningInfo.swift */,
 			);
 			path = SwiftAuthorizationApp;
 			sourceTree = "<group>";
@@ -210,6 +209,7 @@
 				99A67B322723B2D200F7D92D /* SecureXPC */,
 				99A67B382723B2FC00F7D92D /* Blessed */,
 				99662094272557FF00ECE5C7 /* EmbeddedPropertyList */,
+				998D9C332865D623006224C4 /* Authorized */,
 			);
 			productName = SwiftAuthorizationSample;
 			productReference = 99F409CB27216B210010500C /* Swift Authorization Sample.app */;
@@ -270,6 +270,7 @@
 				99A67B312723B2D200F7D92D /* XCRemoteSwiftPackageReference "SecureXPC" */,
 				99A67B372723B2FC00F7D92D /* XCRemoteSwiftPackageReference "Blessed" */,
 				99662093272557FF00ECE5C7 /* XCRemoteSwiftPackageReference "EmbeddedPropertyList" */,
+				998D9C322865D623006224C4 /* XCRemoteSwiftPackageReference "Authorized" */,
 			);
 			productRefGroup = 99F409CC27216B210010500C /* Products */;
 			projectDirPath = "";
@@ -376,7 +377,6 @@
 				99A67B53272439E400F7D92D /* AllowedCommand.swift in Sources */,
 				99A67B4D2724125200F7D92D /* HelperToolInfoPropertyList.swift in Sources */,
 				99A67B502724134800F7D92D /* SharedConstants.swift in Sources */,
-				995AF20B274A465200F855D1 /* DiagnosticSigningInfo.swift in Sources */,
 				99A67B4827240DB100F7D92D /* HelperToolMonitor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -532,9 +532,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 99F409EB2722FC670010500C /* AppConfig.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = R96J7HJPH8;
 				INFOPLIST_KEY_CFBundleDisplayName = "$(DISPLAY_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
@@ -550,9 +550,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 99F409EB2722FC670010500C /* AppConfig.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = R96J7HJPH8;
 				INFOPLIST_KEY_CFBundleDisplayName = "$(DISPLAY_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
@@ -568,9 +568,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 99F409EC2722FD0C0010500C /* HelperToolConfig.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = R96J7HJPH8;
 			};
 			name = Debug;
 		};
@@ -578,9 +578,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 99F409EC2722FD0C0010500C /* HelperToolConfig.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = R96J7HJPH8;
 			};
 			name = Release;
 		};
@@ -625,6 +625,14 @@
 				minimumVersion = 2.0.2;
 			};
 		};
+		998D9C322865D623006224C4 /* XCRemoteSwiftPackageReference "Authorized" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/trilemma-dev/Authorized";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		99A67B312723B2D200F7D92D /* XCRemoteSwiftPackageReference "SecureXPC" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/trilemma-dev/SecureXPC";
@@ -638,7 +646,7 @@
 			repositoryURL = "https://github.com/trilemma-dev/Blessed";
 			requirement = {
 				kind = upToNextMinorVersion;
-				minimumVersion = 0.4.0;
+				minimumVersion = 0.6.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -653,6 +661,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 99662093272557FF00ECE5C7 /* XCRemoteSwiftPackageReference "EmbeddedPropertyList" */;
 			productName = EmbeddedPropertyList;
+		};
+		998D9C332865D623006224C4 /* Authorized */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 998D9C322865D623006224C4 /* XCRemoteSwiftPackageReference "Authorized" */;
+			productName = Authorized;
 		};
 		99A67B322723B2D200F7D92D /* SecureXPC */ = {
 			isa = XCSwiftPackageProductDependency;

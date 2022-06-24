@@ -6,8 +6,9 @@
 //
 
 import Foundation
-import SecureXPC
+import Authorized
 import Blessed
+import SecureXPC
 
 /// Encapsulates a set of constants used throughout the app and helper tool.
 struct SharedConstants {

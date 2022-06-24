@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/trilemma-dev/Blessed",
         "state": {
           "branch": null,
-          "revision": "395c49c07641a0f3cb47c0a6e45293cdb9609707",
-          "version": "0.4.0"
+          "revision": "e7c730ea4bcd2df7b61f022dbd38c5cdc2c875de",
+          "version": "0.6.0"
         }
       },
       {
@@ -17,6 +17,15 @@
           "branch": null,
           "revision": "21bd832e28a9a66ecdb7b4c21910bb0487a22fe5",
           "version": "2.0.2"
+        }
+      },
+      {
+        "package": "Required",
+        "repositoryURL": "https://github.com/trilemma-dev/Required.git",
+        "state": {
+          "branch": null,
+          "revision": "82a4fbd388346ca40b1bbe815014dc45a75d503c",
+          "version": "0.1.1"
         }
       },
       {
