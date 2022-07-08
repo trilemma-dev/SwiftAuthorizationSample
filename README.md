@@ -1,8 +1,9 @@
-SwiftAuthorizationSample demonstrates how to run privileged operations on OS X 10.10 through macOS 12 using a helper
-tool installed with `SMJobBless` and communicate with it using XPC.
+SwiftAuthorizationSample demonstrates how to run privileged operations using a helper tool installed with
+`SMJobBless` and communicate with it using XPC.
 
-(Note: Starting with macOS 13, Apple provides a different approach via 
-[`SMAppService`](https://developer.apple.com/documentation/servicemanagement/smappservice).)
+(Note: If your minimum deployment target is macOS 13 or later, Apple recommends you use
+[SMAppService](https://developer.apple.com/documentation/servicemanagement/smappservice) instead to register a
+Launch Daemon.)
 
 This sample was created with the expectation that you already have an app and are looking to add a privileged helper
 tool in order to perform one or more operations as root. As such this sample is **not** a template and is instead
