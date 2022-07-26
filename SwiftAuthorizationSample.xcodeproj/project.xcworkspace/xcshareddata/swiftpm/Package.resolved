@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "Authorized",
+        "repositoryURL": "https://github.com/trilemma-dev/Authorized",
+        "state": {
+          "branch": null,
+          "revision": "e490b9d3f4a0e8b17a8b39b5a9750b8e0be7548a",
+          "version": "1.0.0"
+        }
+      },
+      {
         "package": "Blessed",
         "repositoryURL": "https://github.com/trilemma-dev/Blessed",
         "state": {
@@ -33,8 +42,8 @@
         "repositoryURL": "https://github.com/trilemma-dev/SecureXPC",
         "state": {
           "branch": null,
-          "revision": "b19860657d5f64c8b535a942bec5ba4d73323a7f",
-          "version": "0.7.0"
+          "revision": "d6e439e2b805de8be9b584fff97cf2f6a839a656",
+          "version": "0.8.0"
         }
       }
     ]
