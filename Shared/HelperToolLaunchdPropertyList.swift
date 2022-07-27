@@ -21,20 +21,19 @@ struct HelperToolLaunchdPropertyList: Decodable {
         case label = "Label"
     }
     
-    /// Creates an immutable in memory representation of the property list by attempting to read it from the helper tool.
-    ///
-    /// - Returns: An immutable representation of the property list.
-    static func main() throws -> HelperToolLaunchdPropertyList {
-        let propertyListData = try EmbeddedPropertyListReader.launchd.readInternal()
-        return try PropertyListDecoder().decode(HelperToolLaunchdPropertyList.self, from: propertyListData)
+    /// An immutable in memory representation of the property list by attempting to read it from the helper tool.
+    static var main: HelperToolLaunchdPropertyList {
+        get throws {
+            try PropertyListDecoder().decode(HelperToolLaunchdPropertyList.self,
+                                             from: try EmbeddedPropertyListReader.launchd.readInternal())
+        }
     }
     
     /// Creates an immutable in memory representation of the property list by attempting to read it from the helper tool.
     ///
-    /// - Parameters:
-    ///   - from: Location of the helper tool on disk.
+    /// - Parameter url: Location of the helper tool on disk.
     init(from url: URL) throws {
-        let propertyListData = try EmbeddedPropertyListReader.launchd.readExternal(from: url)
-        self = try PropertyListDecoder().decode(HelperToolLaunchdPropertyList.self, from: propertyListData)
+        self = try PropertyListDecoder().decode(HelperToolLaunchdPropertyList.self,
+                                                from: try EmbeddedPropertyListReader.launchd.readExternal(from: url))
     }
 }

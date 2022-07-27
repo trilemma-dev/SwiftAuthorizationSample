@@ -24,21 +24,19 @@ struct HelperToolInfoPropertyList: Decodable {
         case bundleIdentifier = "CFBundleIdentifier"
     }
     
-    /// Creates an immutable in memory representation of the property list by attempting to read it from the helper tool.
-    ///
-    /// - Returns: An immutable representation of the property list.
-    static func main() throws -> HelperToolInfoPropertyList {
-        let propertyListData = try EmbeddedPropertyListReader.info.readInternal()
-    
-        return try PropertyListDecoder().decode(HelperToolInfoPropertyList.self, from: propertyListData)
+    /// An immutable in memory representation of the property list by attempting to read it from the helper tool.
+    static var main: HelperToolInfoPropertyList {
+        get throws {
+            try PropertyListDecoder().decode(HelperToolInfoPropertyList.self,
+                                             from: try EmbeddedPropertyListReader.info.readInternal())
+        }
     }
     
     /// Creates an immutable in memory representation of the property list by attempting to read it from the helper tool.
     ///
-    /// - Parameters:
-    ///   - from: Location of the helper tool on disk.
+    /// - Parameter url: Location of the helper tool on disk.
     init(from url: URL) throws {
-        let propertyListData = try EmbeddedPropertyListReader.info.readExternal(from: url)
-        self = try PropertyListDecoder().decode(HelperToolInfoPropertyList.self, from: propertyListData)
+        self = try PropertyListDecoder().decode(HelperToolInfoPropertyList.self,
+                                                from: try EmbeddedPropertyListReader.info.readExternal(from: url))
     }
 }

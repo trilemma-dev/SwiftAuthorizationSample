@@ -107,23 +107,41 @@ enum AllowedCommand: Codable, CaseIterable {
     
     /// How this command should be visually displayed to a user.
     var displayName: String {
-        let executable = String(launchPath.split(separator: "/").last ?? launchPath.dropFirst(0))
-        let formattedArguments = arguments.joined(separator: " ")
-        let auth = requiresAuth ? "[Auth Required]" : ""
+        var name: String = launchPath.split(separator: "/").last! + " " + arguments.joined(separator: " ")
+        if requiresAuth {
+            name += " [Auth Required]"
+        }
         
-        return "\(executable) \(formattedArguments) \(auth)"
+        return name
     }
 }
 
-/// A message sent to the helper tool containing a command potentially an authorization instance.
-struct AllowedCommandMessage: Codable {
-    let command: AllowedCommand
-    let authorization: Authorization?
+/// A message sent to the helper tool containing a command and an authorization instance if needed.
+enum AllowedCommandMessage: Codable {
+    case standardCommand(AllowedCommand)
+    case authorizedCommand(AllowedCommand, Authorization)
+    
+    var command: AllowedCommand {
+        switch self {
+            case .standardCommand(let command):
+                return command
+            case .authorizedCommand(let command, _):
+                return command
+        }
+    }
 }
 
 /// A reply containing the results of the helper tool running a command.
 struct AllowedCommandReply: Codable {
-    let terminationStatus: Int64
+    let terminationStatus: Int32
     let standardOutput: String?
     let standardError: String?
+}
+
+/// Errors that prevent an allowed command from being run.
+enum AllowedCommandError: Error, Codable {
+    /// The user did not grant authorization.
+    case authorizationFailed
+    /// The client did not request authorization, but it was required.
+    case authorizationNotRequested
 }

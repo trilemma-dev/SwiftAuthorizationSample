@@ -9,7 +9,6 @@ import Foundation
 
 /// Convenience wrappers around Security framework functionality.
 enum CodeInfo {
-    
     /// Errors that may occur when trying to determine information about this running helper tool or another on disk executable.
     enum CodeInfoError: Error {
         /// Unable to determine the location of the executable.
@@ -31,52 +30,45 @@ enum CodeInfo {
     static func currentCodeLocation() throws -> URL {
         var path: CFURL?
         let status = SecCodeCopyPath(try copyCurrentStaticCode(), SecCSFlags(), &path)
-        if status == errSecSuccess,
-           let path = path as URL? {
-            return path
-        } else {
+        guard status == errSecSuccess, let path = path as URL? else {
             throw CodeInfoError.codeLocationNotRetrievable(status)
         }
+        
+        return path
     }
     
     /// Determines if the public keys of this helper tool and the executable corresponding to the passed in `URL` match.
     ///
-    /// - Parameters:
-    ///   - forExecutable: On disk location of an executable.
+    /// - Parameter executable: On disk location of an executable.
     /// - Throws: If unable to compare the public keys for the on disk representations of both this helper tool and the executable for the provided URL.
     /// - Returns: If the public keys of their leaf certificates (which is the Developer ID certificate) match.
     static func doesPublicKeyMatch(forExecutable executable: URL) throws -> Bool {
-        var matches = false
-        
-        let currentStaticCode = try copyCurrentStaticCode()
-        let otherStaticCode = try createStaticCode(forExecutable: executable)
-        
-        // Only perform this comparison if the other static code has a valid signature
-        let checkFlags = SecCSFlags.init(rawValue: kSecCSStrictValidate | kSecCSCheckAllArchitectures)
-        if SecStaticCodeCheckValidity(otherStaticCode, checkFlags, nil) == errSecSuccess {
-            let currentKeyData = try copyLeafCertificateKeyData(staticCode: currentStaticCode)
-            let otherKeyData = try copyLeafCertificateKeyData(staticCode: otherStaticCode)
-            
-            matches = (currentKeyData == otherKeyData)
+        // Only perform this comparison if the executable's static code has a valid signature
+        let executableStaticCode = try createStaticCode(forExecutable: executable)
+        let checkFlags = SecCSFlags(rawValue: kSecCSStrictValidate | kSecCSCheckAllArchitectures)
+        guard SecStaticCodeCheckValidity(executableStaticCode, checkFlags, nil) == errSecSuccess else {
+            return false
         }
         
-        return matches
+        let currentKeyData = try copyLeafCertificateKeyData(staticCode: try copyCurrentStaticCode())
+        let executableKeyData = try copyLeafCertificateKeyData(staticCode: executableStaticCode)
+        
+        return currentKeyData == executableKeyData
     }
     
     /// Convenience wrapper around `SecStaticCodeCreateWithPath`.
     ///
-    /// - Parameters:
-    ///   - forExecutable: On disk location of an executable.
+    /// - Parameter executable: On disk location of an executable.
     /// - Throws: If unable to create the static code.
     /// - Returns: Static code instance corresponding to the provided `URL`.
-    static func createStaticCode(forExecutable url: URL) throws -> SecStaticCode {
+    static func createStaticCode(forExecutable executable: URL) throws -> SecStaticCode {
         var staticCode: SecStaticCode?
-        let status = SecStaticCodeCreateWithPath(url as CFURL, SecCSFlags(), &staticCode)
-        if status == errSecSuccess, let staticCode = staticCode {
-            return staticCode
+        let status = SecStaticCodeCreateWithPath(executable as CFURL, SecCSFlags(), &staticCode)
+        guard status == errSecSuccess, let staticCode = staticCode else {
+            throw CodeInfoError.externalStaticCodeNotRetrievable(status)
         }
         
-        throw CodeInfoError.externalStaticCodeNotRetrievable(status)
+        return staticCode
     }
     
     /// Convenience wrapper around `SecCodeCopySelf` and `SecCodeCopyStaticCode`.
@@ -85,18 +77,18 @@ enum CodeInfo {
     /// - Returns: Static code instance corresponding to the executable running this code.
     static func copyCurrentStaticCode() throws -> SecStaticCode {
         var currentCode: SecCode?
-        let status = SecCodeCopySelf(SecCSFlags(), &currentCode)
-        if status == errSecSuccess, let currentCode = currentCode {
-            var currentStaticCode: SecStaticCode?
-            let status = SecCodeCopyStaticCode(currentCode, SecCSFlags(), &currentStaticCode)
-            if status == errSecSuccess, let currentStaticCode = currentStaticCode {
-                return currentStaticCode
-            } else {
-                throw CodeInfoError.helperToolStaticCodeNotRetrievable(status)
-            }
-        } else {
-            throw CodeInfoError.helperToolStaticCodeNotRetrievable(status)
+        let copySelfStatus = SecCodeCopySelf(SecCSFlags(), &currentCode)
+        guard copySelfStatus == errSecSuccess, let currentCode = currentCode else {
+            throw CodeInfoError.helperToolStaticCodeNotRetrievable(copySelfStatus)
         }
+        
+        var currentStaticCode: SecStaticCode?
+        let staticCodeStatus = SecCodeCopyStaticCode(currentCode, SecCSFlags(), &currentStaticCode)
+        guard staticCodeStatus == errSecSuccess, let currentStaticCode = currentStaticCode else {
+            throw CodeInfoError.helperToolStaticCodeNotRetrievable(staticCodeStatus)
+        }
+        
+        return currentStaticCode
     }
     
     /// Returns the leaf certificate in the code's certificate chain.
@@ -109,29 +101,27 @@ enum CodeInfo {
     static func copyLeafCertificate(staticCode: SecStaticCode) throws -> SecCertificate {
         var info: CFDictionary?
         let flags = SecCSFlags(rawValue: kSecCSSigningInformation)
-        if SecCodeCopySigningInformation(staticCode, flags, &info) == errSecSuccess,
+        guard SecCodeCopySigningInformation(staticCode, flags, &info) == errSecSuccess,
            let info = info as NSDictionary?,
            let certificates = info[kSecCodeInfoCertificates as String] as? [SecCertificate],
-           let leafCertificate = certificates.first {
-                return leafCertificate
+           let leafCertificate = certificates.first else {
+            throw CodeInfoError.leafCertificateNotRetrievable
         }
         
-        throw CodeInfoError.leafCertificateNotRetrievable
+        return leafCertificate
     }
     
     /// Returns the signing key in data form for the leaf certificate in the certificate chain.
     ///
-    /// - Parameters:
-    ///  - staticCode: On disk representation.
+    /// - Parameter staticCode: On disk representation.
     /// - Throws: If unable to copy the data.
     /// - Returns: Signing key in data form for the leaf certificate in the certificate chain.
     private static func copyLeafCertificateKeyData(staticCode: SecStaticCode) throws -> Data {
-        let leafCertificate = try copyLeafCertificate(staticCode: staticCode)
-        if let leafKey = SecCertificateCopyKey(leafCertificate),
-           let leafKeyData = SecKeyCopyExternalRepresentation(leafKey, nil) as Data? {
-                return leafKeyData
+        guard let leafKey = SecCertificateCopyKey(try copyLeafCertificate(staticCode: staticCode)),
+              let leafKeyData = SecKeyCopyExternalRepresentation(leafKey, nil) as Data? else {
+            throw CodeInfoError.signingKeyDataNotRetrievable
         }
         
-        throw CodeInfoError.signingKeyDataNotRetrievable
+        return leafKeyData
     }
 }

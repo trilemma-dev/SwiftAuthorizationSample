@@ -38,3 +38,6 @@ OTHER_LDFLAGS = -sectcreate __TEXT __info_plist $(INFOPLIST_FILE) -sectcreate __
 
 // Tells Xcode Archive the helper tool shouldn't be an installable artifact (the app should be).
 SKIP_INSTALL = YES
+
+// Used by the shared code to know which target it's being built for
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = HELPER_TOOL

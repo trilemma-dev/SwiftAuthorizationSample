@@ -532,9 +532,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 99F409EB2722FC670010500C /* AppConfig.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = R96J7HJPH8;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_KEY_CFBundleDisplayName = "$(DISPLAY_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
@@ -550,9 +550,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 99F409EB2722FC670010500C /* AppConfig.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = R96J7HJPH8;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_KEY_CFBundleDisplayName = "$(DISPLAY_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
@@ -568,9 +568,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 99F409EC2722FD0C0010500C /* HelperToolConfig.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = R96J7HJPH8;
+				DEVELOPMENT_TEAM = "";
 			};
 			name = Debug;
 		};
@@ -578,9 +578,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 99F409EC2722FD0C0010500C /* HelperToolConfig.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = R96J7HJPH8;
+				DEVELOPMENT_TEAM = "";
 			};
 			name = Release;
 		};

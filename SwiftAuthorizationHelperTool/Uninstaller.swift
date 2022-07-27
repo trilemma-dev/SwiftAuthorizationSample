@@ -18,17 +18,14 @@ import Foundation
 ///  - To remove the `launchd` property list, its location is assumed to be `/Library/LaunchDaemons/<helper_tool_name>.plist`
 ///     - While this location is not documented in `SMJobBless`, it is used in Apple's EvenBetterAuthorizationSample `Uninstall.sh` script
 enum Uninstaller {
-    
     /// Errors that prevent the uninstall from succeeding.
     enum UninstallError: Error {
         /// Uninstall will not be performed because this code is not running from the blessed location.
-        case notRunningFromBlessedLocation
+        case notRunningFromBlessedLocation(location: URL)
         /// Attempting to unload using `launchctl` failed.
-        ///
-        /// The associated value is the underlying status code.
-        case launchctlFailure(Int32)
+        case launchctlFailure(statusCode: Int32)
         /// The argument provided must be a process identifier, but was not.
-        case notProcessId
+        case notProcessId(invalidArgument: String)
     }
     
     /// Command line argument that identifies to `main` to call the  `uninstallFromCommandLine(...)` function.
@@ -50,19 +47,18 @@ enum Uninstaller {
         exit(0)
     }
     
-    /// Directly uninstalls this executable. Calling this function will terminate this process unless an error is throw.
+    /// Directly uninstalls this executable. Calling this function will terminate this process unless an error is thrown.
     ///
     /// Depending on the the arguments provided to this function, it may wait on another process to exit before performing the uninstall.
     ///
-    /// - Parameters:
-    ///   - withArguments: The command line arguments; the first argument should always be `uninstall`.
+    /// - Parameter arguments: The command line arguments; the first argument should always be `uninstall`.
     /// - Throws: If unable to perform the uninstall, including because the provided arguments are invalid.
     static func uninstallFromCommandLine(withArguments arguments: [String]) throws -> Never {
         if arguments.count == 1 {
             try uninstallImmediately()
         } else {
             guard let pid: pid_t = Int32(arguments[1]) else {
-                throw UninstallError.notProcessId
+                throw UninstallError.notProcessId(invalidArgument: arguments[1])
             }
             try uninstallAfterProcessExits(pid: pid)
         }
@@ -70,8 +66,7 @@ enum Uninstaller {
 
     /// Uninstalls this helper tool after waiting for a process (in practice this helper tool launched via XPC) to terminate.
     ///
-    /// - Parameters:
-    ///   - pid: Identifier for the process which must terminate before performing uninstall. In practice this is identifier is for is a previous run of this helper tool.
+    /// - Parameter pid: Identifier for the process which must terminate before performing uninstall. In practice this is identifier is for is a previous run of this helper tool.
     private static func uninstallAfterProcessExits(pid: pid_t) throws -> Never {
         // When passing 0 as the second argument, no signal is sent, but existence and permission checks are still
         // performed. This checks for the existence of a process ID. If 0 is returned the process still exists, so loop
@@ -96,10 +91,10 @@ enum Uninstaller {
     /// - Throws: Due to one of: unable to determine the on disk location of this running code, that location is not the blessed location, `launchctl` can't
     /// unload this helper tool, the `launchd` property list for this helper tool can't be deleted, or the on disk representation of this helper tool can't be deleted.
     private static func uninstallImmediately() throws -> Never {
-        let sharedConstants = try SharedConstants(caller: .helperTool)
+        let sharedConstants = try SharedConstants()
         let currentLocation = try CodeInfo.currentCodeLocation()
-        if currentLocation != sharedConstants.blessedLocation {
-            throw UninstallError.notRunningFromBlessedLocation
+        guard currentLocation == sharedConstants.blessedLocation else {
+            throw UninstallError.notRunningFromBlessedLocation(location: currentLocation)
         }
         
         // Equivalent to: launchctl unload /Library/LaunchDaemons/<helper tool name>.plist
@@ -111,11 +106,10 @@ enum Uninstaller {
         NSLog("about to wait for launchctl...")
         process.waitUntilExit()
         let terminationStatus = process.terminationStatus
-        if terminationStatus == 0 {
-            NSLog("unloaded from launchctl")
-        } else {
-            throw UninstallError.launchctlFailure(terminationStatus)
+        guard terminationStatus == 0 else {
+            throw UninstallError.launchctlFailure(statusCode: terminationStatus)
         }
+        NSLog("unloaded from launchctl")
         
         // Equivalent to: rm /Library/LaunchDaemons/<helper tool name>.plist
         try FileManager.default.removeItem(at: sharedConstants.blessedPropertyListLocation)

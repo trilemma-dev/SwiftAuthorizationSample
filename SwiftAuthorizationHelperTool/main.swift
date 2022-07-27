@@ -9,7 +9,7 @@ import Foundation
 import SecureXPC
 
 NSLog("starting helper tool. PID \(getpid()). PPID \(getppid()).")
-NSLog("version: \(try HelperToolInfoPropertyList.main().version.rawValue)")
+NSLog("version: \(try HelperToolInfoPropertyList.main.version.rawValue)")
 
 // Command line arguments were provided, so process them
 if CommandLine.arguments.count > 1 {
@@ -25,8 +25,8 @@ if CommandLine.arguments.count > 1 {
             NSLog("argument not recognized: \(firstArgument)")
         }
     }
-} else if getppid() == 1 { // Otherwise if started by launchd, start up XPC server
-    NSLog("parent is launchd, starting up XPC server")
+} else if getppid() == 1 { // Otherwise if started by launchd, start up server
+    NSLog("parent is launchd, starting up server")
     
     let server = try XPCServer.forMachService()
     server.registerRoute(SharedConstants.allowedCommandRoute, handler: AllowedCommandRunner.run(message:))

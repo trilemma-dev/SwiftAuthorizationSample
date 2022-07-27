@@ -12,7 +12,6 @@ import EmbeddedPropertyList
 import SecureXPC
 
 class ViewController: NSViewController {
-    
     // Defined in the Storyboard
     @IBOutlet weak var installedField: NSTextField!
     @IBOutlet weak var versionField: NSTextField!
@@ -53,20 +52,24 @@ class ViewController: NSViewController {
         // Have this button call this target when clicked, the specific function called will differ
         self.installOrUpdateButton.target = self
 
-        // Initialize variables using the app's shared constants
-        guard let sharedConstants = (NSApplication.shared.delegate as? AppDelegate)?.sharedConstants else {
-            fatalError("Unable to access AppDelegate's shared constants")
+        // Initialize variables using shared constants
+        let sharedConstants: SharedConstants
+        do {
+            sharedConstants = try SharedConstants()
+        } catch {
+            fatalError("""
+            One or more property list configuration issues exist. Please check the PropertyListModifier.swift script \
+            is run as part of the build process for both the app and helper tool targets. This script will \
+            automatically create all of the necessary configurations.
+            Issue: \(error)
+            """)
         }
-        let monitor = HelperToolMonitor(constants: sharedConstants)
-        self.updateInstallationStatus(monitor.determineStatus())
-        monitor.start(changeOccurred: updateInstallationStatus)
-        self.monitor = monitor
         self.xpcClient = XPCClient.forMachService(named: sharedConstants.machServiceName)
-        guard let bundledLocation = sharedConstants.bundledLocation else {
-            fatalError("Bundled helper tool location should always be determinable by the app")
-        }
-        self.bundledHelperToolVersion = try! HelperToolInfoPropertyList(from: bundledLocation).version
-        self.bundledLocation = bundledLocation
+        self.bundledLocation = sharedConstants.bundledLocation
+        self.bundledHelperToolVersion = sharedConstants.helperToolVersion
+        self.monitor = HelperToolMonitor(constants: sharedConstants)
+        self.updateInstallationStatus(self.monitor.determineStatus())
+        self.monitor.start(changeOccurred: self.updateInstallationStatus)
     }
     
     override func viewWillAppear() {
@@ -99,65 +102,59 @@ class ViewController: NSViewController {
     
     /// Updates the Installation section of the UI.
     ///
-    /// This gets called by the HelperToolMonitor when changes occur.
+    /// This gets called by the `HelperToolMonitor` when changes occur.
     func updateInstallationStatus(_ status: HelperToolMonitor.InstallationStatus) {
         DispatchQueue.main.async {
             // 8 possible combinations of installation status
             if status.registeredWithLaunchd {
                 if status.registrationPropertyListExists {
                     // Registered: yes | Registration file: yes | Helper tool: yes
-                    if status.helperToolExists {
+                    if case .exists(let installedHelperToolVersion) = status.helperToolExecutable {
                         self.installedField.stringValue = "Yes"
-                        if let installedVersion = status.helperToolBundleVersion,
-                           let bundledVersion = self.bundledHelperToolVersion {
-                            if bundledVersion > installedVersion {
-                                self.installOrUpdateButton.isEnabled = true
-                                self.installOrUpdateButton.title = "Update"
-                                self.installOrUpdateButton.action = #selector(ViewController.update)
-                                let tooltip = "Update to bundled helper tool version \(bundledVersion.rawValue)"
-                                self.installOrUpdateButton.toolTip = tooltip
-                            } else {
-                                self.installOrUpdateButton.isEnabled = false
-                                self.installOrUpdateButton.title = "Update"
-                                self.installOrUpdateButton.action = nil
-                                let tooltip = "Bundled helper tool version \(bundledVersion.rawValue) is not greater " +
-                                              "than installed version"
-                                self.installOrUpdateButton.toolTip = tooltip
-                            }
+                        if self.bundledHelperToolVersion > installedHelperToolVersion {
+                            self.installOrUpdateButton.isEnabled = true
+                            self.installOrUpdateButton.title = "Update"
+                            self.installOrUpdateButton.action = #selector(ViewController.update)
+                            let tooltip = "Update helper tool to version \(self.bundledHelperToolVersion.rawValue)"
+                            self.installOrUpdateButton.toolTip = tooltip
                         } else {
-                            self.installOrUpdateButton.title = "Install"
-                            self.installOrUpdateButton.action = #selector(ViewController.install)
-                            self.installOrUpdateButton.toolTip = nil
+                            self.installOrUpdateButton.isEnabled = false
+                            self.installOrUpdateButton.title = "Update"
+                            self.installOrUpdateButton.action = nil
+                            let tooltip = "Bundled helper tool version \(self.bundledHelperToolVersion.rawValue) is " +
+                                          "not greater than installed version \(installedHelperToolVersion.rawValue)"
+                            self.installOrUpdateButton.toolTip = tooltip
                         }
                         self.uninstallButton.isEnabled = true
-                        self.versionField.stringValue = status.helperToolBundleVersion?.rawValue ?? "unknown"
+                        self.versionField.stringValue = installedHelperToolVersion.rawValue
                         self.runButton.isEnabled = true
                     } else { // Registered: yes | Registration file: yes | Helper tool: no
                         self.installedField.stringValue = "No (helper tool missing)"
                         self.installOrUpdateButton.isEnabled = true
                         self.installOrUpdateButton.title = "Install"
                         self.installOrUpdateButton.action = #selector(ViewController.install)
+                        self.installOrUpdateButton.toolTip = "Install version \(self.bundledHelperToolVersion.rawValue)"
                         self.uninstallButton.isEnabled = false
                         self.versionField.stringValue = "—"
                         self.runButton.isEnabled = false
                     }
                 } else {
                     // Registered: yes | Registration file: no | Helper tool: yes
-                    if status.helperToolExists {
+                    if case .exists(let installedHelperToolVersion) = status.helperToolExecutable {
                         self.installedField.stringValue = "No (registration file missing)"
                         self.installOrUpdateButton.isEnabled = true
                         self.installOrUpdateButton.title = "Install"
                         self.installOrUpdateButton.action = #selector(ViewController.install)
-                        self.installOrUpdateButton.toolTip = nil
+                        self.installOrUpdateButton.toolTip = "Install version \(self.bundledHelperToolVersion.rawValue)"
                         self.uninstallButton.isEnabled = false
-                        self.versionField.stringValue = status.helperToolBundleVersion?.rawValue ?? "unknown"
+                        self.versionField.stringValue = installedHelperToolVersion.rawValue
                         self.runButton.isEnabled = false
                     } else { // Registered: yes | Registration file: no | Helper tool: no
                         self.installedField.stringValue = "No (helper tool and registration file missing)"
                         self.installOrUpdateButton.isEnabled = true
                         self.installOrUpdateButton.title = "Install"
                         self.installOrUpdateButton.action = #selector(ViewController.install)
-                        self.installOrUpdateButton.toolTip = nil
+                        self.installOrUpdateButton.toolTip = "Install version \(self.bundledHelperToolVersion.rawValue)"
                         self.uninstallButton.isEnabled = false
                         self.versionField.stringValue = "—"
                         self.runButton.isEnabled = false
@@ -166,42 +163,43 @@ class ViewController: NSViewController {
             } else {
                 if status.registrationPropertyListExists {
                     // Registered: no | Registration file: yes | Helper tool: yes
-                    if status.helperToolExists {
+                    if case .exists(let installedHelperToolVersion) = status.helperToolExecutable {
                         self.installedField.stringValue = "No (helper tool and registration file exist)"
                         self.installOrUpdateButton.isEnabled = true
                         self.installOrUpdateButton.title = "Install"
                         self.installOrUpdateButton.action = #selector(ViewController.install)
-                        self.installOrUpdateButton.toolTip = nil
+                        self.installOrUpdateButton.toolTip = "Install version \(self.bundledHelperToolVersion.rawValue)"
                         self.uninstallButton.isEnabled = false
-                        self.versionField.stringValue = status.helperToolBundleVersion?.rawValue ?? "unknown"
+                        self.versionField.stringValue = installedHelperToolVersion.rawValue
                         self.runButton.isEnabled = false
                     } else { // Registered: no | Registration file: yes | Helper tool: no
                         self.installedField.stringValue = "No (registration file exists)"
                         self.installOrUpdateButton.isEnabled = true
                         self.installOrUpdateButton.title = "Install"
                         self.installOrUpdateButton.action = #selector(ViewController.install)
-                        self.installOrUpdateButton.toolTip = nil
+                        self.installOrUpdateButton.toolTip = "Install version \(self.bundledHelperToolVersion.rawValue)"
                         self.uninstallButton.isEnabled = false
                         self.versionField.stringValue = "—"
                         self.runButton.isEnabled = false
                     }
                 } else {
                     // Registered: no | Registration file: no | Helper tool: yes
-                    if status.helperToolExists {
+                    if case .exists(let installedHelperToolVersion) = status.helperToolExecutable {
                         self.installedField.stringValue = "No (helper tool exists)"
                         self.installOrUpdateButton.isEnabled = true
                         self.installOrUpdateButton.title = "Install"
                         self.installOrUpdateButton.action = #selector(ViewController.install)
-                        self.installOrUpdateButton.toolTip = nil
+                        let tooltip = "Install helper tool version \(self.bundledHelperToolVersion.rawValue)"
+                        self.installOrUpdateButton.toolTip = tooltip
                         self.uninstallButton.isEnabled = false
-                        self.versionField.stringValue = status.helperToolBundleVersion?.rawValue ?? "unknown"
+                        self.versionField.stringValue = installedHelperToolVersion.rawValue
                         self.runButton.isEnabled = false
                     } else { // Registered: no | Registration file: no | Helper tool: no
                         self.installedField.stringValue = "No"
                         self.installOrUpdateButton.isEnabled = true
                         self.installOrUpdateButton.title = "Install"
                         self.installOrUpdateButton.action = #selector(ViewController.install)
-                        self.installOrUpdateButton.toolTip = nil
+                        self.installOrUpdateButton.toolTip = "Install version \(self.bundledHelperToolVersion.rawValue)"
                         self.uninstallButton.isEnabled = false
                         self.versionField.stringValue = "—"
                         self.runButton.isEnabled = false
@@ -219,7 +217,7 @@ class ViewController: NSViewController {
         } catch AuthorizationError.canceled {
             // No user feedback needed, user canceled
         } catch {
-            self.showModal(title: "Install Failed", message: String(describing: error))
+            self.showModal(title: "Install Failed", error: error)
         }
     }
     
@@ -231,7 +229,7 @@ class ViewController: NSViewController {
                     case .connectionInterrupted:
                         break // It's expected the connection is interrupted as part of updating the client
                     default:
-                        self.showModal(title: "Update Failed", message: String(describing: error))
+                        self.showModal(title: "Update Failed", error: error)
                 }
             }
         }
@@ -245,19 +243,24 @@ class ViewController: NSViewController {
                     case .connectionInterrupted:
                         break // It's expected the connection is interrupted as part of uninstalling the client
                     default:
-                        self.showModal(title: "Uninstall Failed", message: String(describing: error))
+                        self.showModal(title: "Uninstall Failed", error: error)
                 }
             }
         }
     }
     
     /// Show a modal to the user. In practice used to communicate an error.
-    private func showModal(title: String, message: String) {
+    private func showModal(title: String, error: Error) {
         DispatchQueue.main.async {
             if let window = self.view.window {
                 let alert = NSAlert()
                 alert.messageText = title
-                alert.informativeText = message
+                // Handler error represents an error thrown by a closure registered with the server
+                if let error = error as? XPCError, case .handlerError(let handlerError) = error {
+                    alert.informativeText = handlerError.localizedDescription
+                } else {
+                    alert.informativeText = error.localizedDescription
+                }
                 alert.addButton(withTitle: "OK")
                 alert.beginSheetModal(for: window, completionHandler: nil)
                 _ = NSApp.runModal(for: window)
@@ -267,26 +270,49 @@ class ViewController: NSViewController {
     
     /// Requests the helper tool to run the command currently selected in the popup.
     @IBAction func run(_ sender: NSButton) {
-        self.outputText.string = "" // Immediately clear the output, response to shown will be returned async
+        self.outputText.string = "" // Immediately clear the output, response will be returned async
         
         guard let command = commandPopup.selectedItem?.representedObject as? AllowedCommand else {
             fatalError("Command popup contained unexpected item")
         }
         
-        // If authorization is needed, try to create one, if we fail early exit this function
-        if command.requiresAuth && self.authorization == nil {
+        let message: AllowedCommandMessage
+        if command.requiresAuth {
+            // If it hasn't been done yet, define the example right used to self-restrict this command
             do {
-                self.authorization = try Authorization()
+                if !(try SharedConstants.exampleRight.isDefined()) {
+                    let rules: Set<AuthorizationRightRule> = [CannedAuthorizationRightRules.authenticateAsAdmin]
+                    let description = "\(ProcessInfo.processInfo.processName) would like to perform a secure action."
+                    try SharedConstants.exampleRight.createOrUpdateDefinition(rules: rules, descriptionKey: description)
+                }
             } catch {
                 DispatchQueue.main.async {
                     self.outputText.textColor = NSColor.systemRed
-                    self.outputText.string = String(describing: error)
+                    self.outputText.string = error.localizedDescription
                 }
                 return
             }
+            
+            if let authorization = self.authorization {
+                message = .authorizedCommand(command, authorization)
+            } else {
+                do {
+                    let authorization = try Authorization()
+                    self.authorization = authorization
+                    message = .authorizedCommand(command, authorization)
+                } catch {
+                    DispatchQueue.main.async {
+                        self.outputText.textColor = NSColor.systemRed
+                        self.outputText.string = error.localizedDescription
+                    }
+                    return
+                }
+            }
+        } else {
+            message = .standardCommand(command)
         }
         
-        self.xpcClient.sendMessage(AllowedCommandMessage(command: command, authorization: self.authorization),
+        self.xpcClient.sendMessage(message,
                                    to: SharedConstants.allowedCommandRoute,
                                    withResponse: self.displayAllowedCommandResponse(_:))
     }
@@ -307,7 +333,12 @@ class ViewController: NSViewController {
                     }
                 case let .failure(error):
                     self.outputText.textColor = NSColor.systemRed
-                    self.outputText.string = String(describing: error)
+                    // Handler error represents an error thrown by a closure registered with the server
+                    if case .handlerError(let handlerError) = error {
+                        self.outputText.string = handlerError.localizedDescription
+                    } else {
+                        self.outputText.string = error.localizedDescription
+                    }
             }
         }
     }

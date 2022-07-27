@@ -14,19 +14,27 @@ import EmbeddedPropertyList
 /// means this monitor has a limitation that if *only* the launchd registration changes then this monitor will not automatically pick up this changed. However, if
 /// `determineStatus()` is called it will always reflect the latest state including querying launchd status.
 class HelperToolMonitor {
-    
     /// Encapsulates the installation status at approximately a moment in time.
     ///
     /// The individual properties of this struct can't be queried all at once, so it is possible for this to reflect a state that never truly existed simultaneously.
     struct InstallationStatus {
+        
+        /// Status of the helper tool executable as exists on disk.
+        enum HelperToolExecutable {
+            /// The helper tool exists in its expected location.
+            ///
+            /// Associated value is the helper tool's bundle version.
+            case exists(BundleVersion)
+            /// No helper tool was found.
+            case missing
+        }
+        
         /// The helper tool is registered with launchd (according to launchctl).
         let registeredWithLaunchd: Bool
         /// The property list used by launchd exists on disk.
         let registrationPropertyListExists: Bool
-        /// The helper tool run by launchd exists on disk.
-        let helperToolExists: Bool
-        /// The `CFBundleVersion` of the helper tool on disk. Will be non-nil if `helperToolExists` is `true`.
-        let helperToolBundleVersion: BundleVersion?
+        /// Whether an on disk representation of the helper tool exists in its "blessed" location.
+        let helperToolExecutable: HelperToolExecutable
     }
     
     /// Directories containing installed helper tools and their registration property lists.
@@ -82,6 +90,10 @@ class HelperToolMonitor {
     /// Determines the installation status of the helper tool
     /// - Returns: The status of the helper tool installation.
     func determineStatus() -> InstallationStatus {
+        // Sleep for 50ms because on disk file changes, which triggers this call, can occur before launchctl knows about
+        // the (de)registration
+        Thread.sleep(forTimeInterval: 0.05)
+        
         // Registered with launchd
         let process = Process()
         process.launchPath = "/bin/launchctl"
@@ -97,20 +109,16 @@ class HelperToolMonitor {
         let registrationPropertyListExists = FileManager.default
                                                         .fileExists(atPath: constants.blessedPropertyListLocation.path)
         
-        let helperToolBundleVersion: BundleVersion?
-        let helperToolExists: Bool
+        let helperToolExecutable: InstallationStatus.HelperToolExecutable
         do {
             let infoPropertyList = try HelperToolInfoPropertyList(from: constants.blessedLocation)
-            helperToolBundleVersion = infoPropertyList.version
-            helperToolExists = true
+            helperToolExecutable = .exists(infoPropertyList.version)
         } catch {
-            helperToolBundleVersion = nil
-            helperToolExists = false
+            helperToolExecutable = .missing
         }
         
         return InstallationStatus(registeredWithLaunchd: registeredWithLaunchd,
                                   registrationPropertyListExists: registrationPropertyListExists,
-                                  helperToolExists: helperToolExists,
-                                  helperToolBundleVersion: helperToolBundleVersion)
+                                  helperToolExecutable: helperToolExecutable)
     }
 }
