@@ -1,4 +1,3 @@
-#!/usr/bin/env xcrun --sdk macosx swift
 //
 //  PropertyListModifier.swift
 //  SwiftAuthorizationSample
