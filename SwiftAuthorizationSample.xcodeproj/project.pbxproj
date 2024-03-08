@@ -310,7 +310,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift satisfy-job-bless-requirements\n";
+			shellScript = "swiftc \"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift -o \"${SRCROOT}\"/BuildScripts/PropertyListModifier\n\"${SRCROOT}\"/BuildScripts/PropertyListModifier satisfy-job-bless-requirements\n";
 		};
 		99F409F0272303D10010500C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -327,7 +327,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift cleanup-job-bless-requirements\n";
+			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier cleanup-job-bless-requirements\nrm \"${SRCROOT}\"/BuildScripts/PropertyListModifier\n";
 		};
 		99F409F1272303E00010500C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -344,7 +344,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift satisfy-job-bless-requirements specify-mach-services auto-increment-version\n\n";
+			shellScript = "swiftc \"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift -o \"${SRCROOT}\"/BuildScripts/PropertyListModifier\n\"${SRCROOT}\"/BuildScripts/PropertyListModifier satisfy-job-bless-requirements specify-mach-services auto-increment-version\n";
 		};
 		99F409F2272303F20010500C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -361,7 +361,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier.swift cleanup-job-bless-requirements cleanup-mach-services\n";
+			shellScript = "\"${SRCROOT}\"/BuildScripts/PropertyListModifier cleanup-job-bless-requirements cleanup-mach-services\nrm \"${SRCROOT}\"/BuildScripts/PropertyListModifier\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
